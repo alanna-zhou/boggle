@@ -11,9 +11,6 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
-(** Raised when word cannot be read on a board.*)
-exception InvalidWord of string 
-
 (** The desired board configuration, or the method through which the board
     will be generated. The standard configuration uses prespecified die to generate
     each letter on the board. *)
@@ -25,7 +22,7 @@ val generate : size -> t
 
 (** [is_valid_word w b] check whether word [w] can be formed on board [b] 
     looking only in the horizontal and vertical directions. The word can appear 
-    backward on the board. Raises [InvalidWord] if [w] is not a valid word in [b].*)
+    backward on the board.*)
 val is_valid_word: string -> t -> bool
 
 (** [word_score w b] is the score of the word w in board b. The score is
