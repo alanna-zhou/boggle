@@ -7,13 +7,13 @@ type command =
 
 exception Empty
 
-exception Malformed
+exception Invalid
 
 let parse str = 
   match (String.trim str) with
-  |""-> Empty
+  |""-> raise Empty
   |"start"->Start
   |"quit"->Quit
   |"score"-> Score
   |"help"-> Help
-  |_-> Invalid
+  |_-> raise Invalid
