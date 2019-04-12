@@ -1,0 +1,5 @@
+"Resource: /Users/khyatisipani/cs3110-a6/a6/board.ml": "\212\029\140\217\143\000\178\004\233\128\t\152\236\248B~"
+"Rule: ocaml dependencies mli (%=board )": "\241\198\172\012\248\231\003W\179\005\006\005U\143z\133"
+"Resource: /Users/khyatisipani/cs3110-a6/a6/board.mli": "\131\130Z\142\214\240\179]r\001\137\143\177(\220\191"
+"Rule: ocaml: mli -> cmi (%=board )": "CuQ2\015\15298\162:\196\000\138T\229%"
+"Rule: ocaml dependencies ml (%=board )": "F\242E\130\\\226\171\2009\030)\181\183\209@y"
