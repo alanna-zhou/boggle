@@ -1,0 +1,25 @@
+### Starting build.
+# Target: board.mli.depends, tags: { extension:mli, file:board.mli, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules board.mli > board.mli.depends # cached
+# Target: board.cmi, tags: { byte, compile, extension:mli, file:board.mli, interf, ocaml, quiet }
+ocamlfind ocamlc -c -o board.cmi board.mli # cached
+# Target: board.ml.depends, tags: { extension:ml, file:board.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules board.ml > board.ml.depends # cached
+# Target: board.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:board.cmo, file:board.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -o board.cmo board.ml
++ ocamlfind ocamlc -c -o board.cmo board.ml
+File "board.ml", line 1:
+Error: The implementation board.ml does not match the interface board.cmi:
+       The value `word_score' is required but not provided
+       File "board.mli", line 34, characters 0-34: Expected declaration
+       The value `is_valid_word' is required but not provided
+       File "board.mli", line 29, characters 0-38: Expected declaration
+       The value `generate' is required but not provided
+       File "board.mli", line 24, characters 0-24: Expected declaration
+       The extension constructor `InvalidWord' is required but not provided
+       The type `size' is required but not provided
+       File "board.mli", line 12, characters 0-15: Expected declaration
+       The type `t' is required but not provided
+       File "board.mli", line 9, characters 0-6: Expected declaration
+Command exited with code 2.
+# Compilation unsuccessful.
