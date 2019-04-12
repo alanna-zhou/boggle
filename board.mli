@@ -33,6 +33,12 @@ val is_valid_word: string -> t -> bool
     Requires: word w must be a valid word in board b. *)
 val word_score: string -> t -> int
 
+(** [format] is a printing function suitable for use
+     with the toplevel's [#install_printer] directive.
+     It outputs a textual representation of a board
+     on the given formatter. *)
+val format : Format.formatter -> t -> unit
+
 
 
 
