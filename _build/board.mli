@@ -11,6 +11,8 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
+type board_type = Standard of size | Random of size 
+
 (** The desired board configuration, or the method through which the board
     will be generated. The standard configuration uses prespecified die to generate
     each letter on the board. *)
@@ -18,7 +20,7 @@ type size = int
 
 (** [generate size] generates a board of dimensions [size] x [size]. It uses
     the standard die to decide each letter on the board.   *)
-val generate : size -> t
+val generate : board_type -> t
 
 (** [is_valid_word w b] check whether word [w] can be formed on board [b] 
     looking only in the horizontal and vertical directions. The word can appear 
@@ -34,7 +36,7 @@ val word_score: string -> t -> int
      with the toplevel's [#install_printer] directive.
      It outputs a textual representation of a board
      on the given formatter. *)
-val format : Format.formatter -> t -> unit
+val format : Format.formatter -> t -> size -> unit
 
 
 
