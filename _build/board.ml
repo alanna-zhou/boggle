@@ -75,14 +75,38 @@ let positions_of_neighbors (node:node) (board:t) : int list =
     List.filter (fun x -> x >= 0 && x < (size*size)) [pos-size;pos-size-1;pos+size-1;pos+1;pos-1;pos+size+1;pos-size+1;pos+size] 
   end 
 
-let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
+let get_node (index:int) (board:t) : node = 
+  List.nth board index
+
+let get_nodes (letter:char) (board:t) : node = 
   failwith "unimplemented"
+  (* List.filter (fun node -> node.letter = letter) board  *)
+
+let letters_of_neighbors (pos_list:int list) (board:t) : char list =
+  List.map (fun x -> let node = get_node x board in node.letter) pos_list
+
+let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
+  let pos_list = positions_of_neighbors node board in 
+  let neighbors = letters_of_neighbors pos_list board in 
+  List.mem letter neighbors 
 
 let is_valid_word (word:string) (board:t) : bool = 
-  List.exists2 node_is_letter board [word.[0]]
+  failwith "unimplemented"
+  (* let is_valid_acc = List.exists2 node_is_letter board [word.[0]] in 
+  let rec check_neighbors (index:int) (word:string) (acc:bool) = begin
+    if index = String.length word then acc
+    else begin 
+    let nodes = get_nodes (word.[index-1]) board in 
+    let letter = word.[index] in 
+    let is_valid = is_valid_neighbor node letter board in 
+    (is_valid::acc)
+    end 
+  end 
+  in check_neighbors 1 word is_valid_acc  *)
+
 
 let word_score (word:string) (board:t) : int =
-  failwith "unimplemented"
+  String.length word 
 
 let format (formatter:Format.formatter) (board:t) (size:int) : unit = 
   failwith "unimplemented"
