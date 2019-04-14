@@ -1,6 +1,5 @@
   
 type command =
-  |Start
   |Quit
   |Score 
   |Help
