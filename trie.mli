@@ -1,4 +1,4 @@
-(** [t] is the type of a Trie, initially will be only a string list list*)
+module type Trie = sig(** [t] is the type of a Trie, initially will be only a string list list*)
 type t
 
 val empty : t 
@@ -16,3 +16,5 @@ val contains : t -> string -> bool
 
 (** [to_list trie] is [trie] in the form of an ordered string list*)
 val to_list : t -> string list
+
+end

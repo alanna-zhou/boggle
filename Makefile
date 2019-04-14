@@ -1,4 +1,4 @@
-MODULES=board state main authors command trie 
+MODULES=board command state main authors trie
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
@@ -17,6 +17,13 @@ test:
 
 play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
+
+check:
+	bash checkenv.sh && bash checktypes.sh
+
+finalcheck: check
+	bash checkzip.sh
+	bash finalcheck.sh
 
 zip:
 	zip a6.zip *.ml* *.json _tags Makefile

@@ -3,6 +3,10 @@
 ocamlfind ocamldep -modules test.ml > test.ml.depends
 # Target: board.mli.depends, tags: { debug, extension:mli, file:board.mli, ocaml, ocamldep, quiet }
 ocamlfind ocamldep -modules board.mli > board.mli.depends # cached
+# Target: trie.mli.depends, tags: { debug, extension:mli, file:trie.mli, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules trie.mli > trie.mli.depends # cached
+# Target: trie.cmi, tags: { byte, compile, debug, extension:mli, file:trie.mli, interf, ocaml, quiet }
+ocamlfind ocamlc -c -g -o trie.cmi trie.mli
 # Target: state.mli.depends, tags: { debug, extension:mli, file:state.mli, ocaml, ocamldep, quiet }
 ocamlfind ocamldep -modules state.mli > state.mli.depends # cached
 # Target: board.cmi, tags: { byte, compile, debug, extension:mli, file:board.mli, interf, ocaml, quiet }

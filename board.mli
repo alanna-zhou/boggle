@@ -1,3 +1,4 @@
+open Trie
 (** 
    Representation of static board data.
 
