@@ -1,19 +1,19 @@
   
-  type command =
-    |Start
-    |Quit
-    |Score 
-    |Help
-    |Entry of string
+type command =
+  |Start
+  |Quit
+  |Score 
+  |Help
+  |Entry of string
 
-  exception Empty
+exception Empty
 
-  exception Invalid
+exception Invalid
 
-  let parse str = 
-    match (String.trim str) with
-    |""-> raise Empty
-    |"#quit" -> Quit
-    |"#score" -> Score
-    |"#help" -> Help
-    |x -> Entry (x)
+let parse str = 
+  match (String.trim str) with
+  |""-> raise Empty
+  |"#quit" -> Quit
+  |"#score" -> Score
+  |"#help" -> Help
+  |x -> Entry (x)
