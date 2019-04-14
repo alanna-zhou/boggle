@@ -24,7 +24,7 @@ let rec add_word trie word =
 let add_word (trie:t) (word:string) : t =
   failwith "unimplemented"
 
-let add_words_from_file (word:string) : t =
+let add_words_from_file (filename:string) : t =
   failwith "unimplemented"
 
 let contains (trie:t) (word:string) : bool =

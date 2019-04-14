@@ -16,9 +16,7 @@ type board_type = Standard of size | Random of size
 let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = Trie.empty 
-
-(* Random.int 6 *)
+let english_words = add_words_from_file "english.txt"
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -74,14 +72,14 @@ let generate_standard_4 =
     end 
   in create_board 15 {nodes=[];words=Trie.empty}
 
-(* let all_board_words (board:t) =  *)
-
+let all_board_words (board:t) = 
+  failwith "unimplemented"
 
 
 let generate (board_type:board_type) : t = 
   match board_type with 
   | Standard size -> if size = 4 then generate_standard_4 else failwith "unimplemented"
-  | Random size -> failwith "unimplemented"
+  | Random size -> generate_random size
 
 let node_is_letter (node:node) (letter:char) : bool = 
   node.letter = letter
