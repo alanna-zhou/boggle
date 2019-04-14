@@ -1,15 +1,15 @@
 ### Starting build.
-# Target: test.ml.depends, tags: { debug, extension:ml, file:test.ml, ocaml, ocamldep, quiet }
+# Target: test.ml.depends, tags: { debug, extension:ml, file:test.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules test.ml > test.ml.depends
-# Target: board.mli.depends, tags: { debug, extension:mli, file:board.mli, ocaml, ocamldep, quiet }
+# Target: board.mli.depends, tags: { debug, extension:mli, file:board.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules board.mli > board.mli.depends # cached
-# Target: state.mli.depends, tags: { debug, extension:mli, file:state.mli, ocaml, ocamldep, quiet }
+# Target: state.mli.depends, tags: { debug, extension:mli, file:state.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules state.mli > state.mli.depends # cached
-# Target: board.cmi, tags: { byte, compile, debug, extension:mli, file:board.mli, interf, ocaml, quiet }
+# Target: board.cmi, tags: { byte, compile, debug, extension:mli, file:board.mli, interf, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -g -o board.cmi board.mli
-# Target: state.cmi, tags: { byte, compile, debug, extension:mli, file:state.mli, interf, ocaml, quiet }
+# Target: state.cmi, tags: { byte, compile, debug, extension:mli, file:state.mli, interf, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -g -o state.cmi state.mli
-# Target: test.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet }
+# Target: test.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -g -o test.cmo test.ml
 + ocamlfind ocamlc -c -g -o test.cmo test.ml
 File "test.ml", line 1, characters 5-11:
