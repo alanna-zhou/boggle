@@ -1,22 +1,18 @@
 ### Starting build.
-# Target: test.ml.depends, tags: { debug, extension:ml, file:test.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules test.ml > test.ml.depends
-# Target: board.mli.depends, tags: { debug, extension:mli, file:board.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules board.mli > board.mli.depends # cached
-# Target: trie.mli.depends, tags: { debug, extension:mli, file:trie.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules trie.mli > trie.mli.depends # cached
-# Target: trie.cmi, tags: { byte, compile, debug, extension:mli, file:trie.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -g -o trie.cmi trie.mli
-# Target: state.mli.depends, tags: { debug, extension:mli, file:state.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules state.mli > state.mli.depends # cached
-# Target: board.cmi, tags: { byte, compile, debug, extension:mli, file:board.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -g -o board.cmi board.mli
-# Target: state.cmi, tags: { byte, compile, debug, extension:mli, file:state.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -g -o state.cmi state.mli
-# Target: test.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -g -o test.cmo test.ml
-+ ocamlfind ocamlc -c -g -o test.cmo test.ml
-File "test.ml", line 1, characters 5-11:
-Error: Unbound module OUnit2
+# Target: board.mli.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:mli, file:board.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules board.mli > board.mli.depends
+# Target: trie.mli.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:mli, file:trie.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules trie.mli > trie.mli.depends
+# Target: trie.cmi, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:mli, file:trie.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o trie.cmi trie.mli
+# Target: board.cmi, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:mli, file:board.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmi board.mli
+# Target: board.ml.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:ml, file:board.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules board.ml > board.ml.depends
+# Target: board.cmo, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:cmo, extension:ml, file:board.cmo, file:board.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmo board.ml
++ ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmo board.ml
+File "board.ml", line 9, characters 10-16:
+Error: Unbound type constructor Trie.t
 Command exited with code 2.
 # Compilation unsuccessful.
