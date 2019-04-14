@@ -1,10 +1,14 @@
 
-type t = Head of t list | Node of (string * t list) | Leaf 
+(* type t = Head of t list | Node of (string * t list) | Leaf  *)
 
-let empty = Leaf 
+type t = string list
 
-let rec add_word trie word = 
-  failwith "unimplemented"
+(* let empty = Leaf  *)
+
+let empty = []
+
+(* let rec add_word trie word = 
+  failwith "unimplemented" *)
 (* match trie with
    | Head  (children) -> begin
     match children with
@@ -22,13 +26,17 @@ let rec add_word trie word =
    end *)
 
 let add_word (trie:t) (word:string) : t =
-  failwith "unimplemented"
+  word::trie
+  (* failwith "unimplemented" *)
+
+let add_words (trie:t) (words:string list) : t =
+  words@trie
 
 let add_words_from_file (filename:string) : t =
   failwith "unimplemented"
 
 let contains (trie:t) (word:string) : bool =
-  failwith "unimplemented"
+  List.mem word trie 
 
 let to_list (trie:t) : string list =
   failwith "unimplemented"
