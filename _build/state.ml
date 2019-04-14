@@ -9,10 +9,10 @@ type t = {
 }
 
 let init (board:Board.t) : t = 
-  failwith "unimplemented"
+  {board=board;score=0;words=Trie.empty}
 
 let score (state:t) : int = 
-  failwith "unimplemented"
+  state.score
 
 let update (state:t) (word:string) : t =
   failwith "unimplemented"

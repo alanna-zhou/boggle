@@ -1,5 +1,7 @@
 
-  type t = Head of t list | Node of (string * t list) | Leaf ;;
+  type t = Head of t list | Node of (string * t list) | Leaf 
+
+  let empty = Leaf 
 
   let rec add_word trie word = 
   failwith "unimplemented"
