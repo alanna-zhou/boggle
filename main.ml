@@ -5,7 +5,25 @@ open State
 type game = {
   state : State.t;
 }
-let main () =
-  failwith "unimplemented"
+let play_game () =
+  playing_game State.init
 
-let () = main ()
+let update_state (st:State.t)=
+  print_endline "Enter a word";
+  let input = read_line in
+  if Trie.contains st.words input 
+  then 
+
+let rec playing_game state=
+  if State.end_state state 
+  then (print_endline("Game Over \n Your score: " ^ string_of_int State.score);
+     exit 0)
+  else playing_game (update_state state)
+let main () =
+  ANSITerminal.(print_string [red]
+                  "\n Welcome to the Boggle Game engine.\n");
+  print_endline "Please f to begin";
+  print_string  "> "; 
+    match read_line () with
+  | "f"-> play_game ()
+  | _ -> ()
