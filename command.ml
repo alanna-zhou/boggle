@@ -1,5 +1,3 @@
-module Command = struct 
-
   type command =
     |Start
     |Quit
@@ -18,5 +16,3 @@ module Command = struct
     |"#score"-> Score
     |"#help"-> Help
     |_-> raise Invalid
-
-end

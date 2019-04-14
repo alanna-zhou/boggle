@@ -1,6 +1,8 @@
 (** [t] is the type of a Trie, initially will be only a string list list*)
 type t
 
+val empty : t 
+
 (** [add_word trie word] is [trie] after [word] is inserted into it*)
 val add_word : t -> string -> t
 
