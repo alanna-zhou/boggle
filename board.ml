@@ -9,7 +9,8 @@ type t = node list
 
 type board_type = Standard of size | Random of size 
 
-let alphabet = [|'A';'B';'C';'D';'E';'F';'G';'H';'I';'J';'K';'L';'M';'N';'O';'P';'Q';'R';'S';'T';'U';'V';'W';'X';'Y';'Z'|]
+let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
+let vowels = [|'A';'E';'I';'O';'U'|]
 
 (* Random.int 6 *)
 
@@ -43,9 +44,17 @@ let random_char die_arr (bound:int) =
 let generate_random (size:int) = 
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
-      let letter = Array.get alphabet (Random.int (Array.length alphabet)) in 
+      let zero_or_one = Random.int 2 in 
+      if zero_or_one = 0 then begin
+      let letter = Array.get consonants (Random.int (Array.length consonants)) in 
       let node = create_node letter index in 
       create_board (index-1) (node::board)
+      end
+      else begin 
+      let letter = Array.get vowels (Random.int (Array.length vowels)) in 
+      let node = create_node letter index in 
+      create_board (index-1) (node::board)
+      end 
     end
   in create_board ((size*size)-1) []
 
