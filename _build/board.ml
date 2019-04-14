@@ -1,16 +1,20 @@
-
 type node = {
   letter : char;
   position : int;
 }
 type size = int
 
-type t = node list 
+type t = {
+  nodes : node list;
+  words : Trie.t;
+}
 
 type board_type = Standard of size | Random of size 
 
 let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
+
+let english_words = Trie.empty 
 
 (* Random.int 6 *)
 
@@ -48,15 +52,15 @@ let generate_random (size:int) =
       if zero_or_one = 0 then begin
       let letter = Array.get consonants (Random.int (Array.length consonants)) in 
       let node = create_node letter index in 
-      create_board (index-1) (node::board)
+      create_board (index-1) {nodes=(node::board.nodes);words=board.words}
       end
       else begin 
       let letter = Array.get vowels (Random.int (Array.length vowels)) in 
       let node = create_node letter index in 
-      create_board (index-1) (node::board)
+      create_board (index-1) {nodes=(node::board.nodes);words=board.words}
       end 
     end
-  in create_board ((size*size)-1) []
+  in create_board ((size*size)-1) {nodes=[];words=Trie.empty}
 
 let generate_standard_4 =
   let rec create_board (index:int) (board:t) = 
@@ -64,9 +68,13 @@ let generate_standard_4 =
       let die = Array.get standard_4 index in 
       let letter = random_char die 6 in 
       let node = create_node letter index in 
-      create_board (index-1) (node::board)
+      create_board (index-1) {nodes=(node::board.nodes);words=board.words}
     end 
-  in create_board 15 []
+  in create_board 15 {nodes=[];words=Trie.empty}
+
+(* let all_board_words (board:t) =  *)
+
+
 
 let generate (board_type:board_type) : t = 
   match board_type with 
@@ -77,7 +85,7 @@ let node_is_letter (node:node) (letter:char) : bool =
   node.letter = letter
 
 let positions_of_neighbors (node:node) (board:t) : int list =
-  let size = int_of_float (Pervasives.sqrt ((float_of_int ((List.length board)+1)))) in 
+  let size = int_of_float (Pervasives.sqrt ((float_of_int ((List.length board.nodes)+1)))) in 
   let pos = node.position in 
   if (pos mod size) = 0 then begin 
     List.filter (fun x -> x >= 0 && x < (size*size)) [pos+size;pos-size;pos+1;pos+size+1;pos-size+1]
@@ -96,7 +104,7 @@ let positions_of_neighbors (node:node) (board:t) : int list =
   end 
 
 let get_node (index:int) (board:t) : node = 
-  List.nth board index
+  List.nth board.nodes index
 
 let get_nodes (letter:char) (board:t) : node = 
   failwith "unimplemented"
