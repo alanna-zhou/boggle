@@ -6,6 +6,8 @@ type node = {
 }
 type size = int
 
+exception InvalidSize of size 
+
 type t = {
   nodes : node list;
   words : Trie.t;
@@ -53,14 +55,14 @@ let generate_random (size:int) =
     if index < 0 then board else begin
       let zero_or_one = Random.int 2 in 
       if zero_or_one = 0 then begin
-      let letter = Array.get consonants (Random.int (Array.length consonants)) in 
-      let node = create_node letter index in 
-      create_board (index-1) {nodes=(node::board.nodes);words=board.words}
+        let letter = Array.get consonants (Random.int (Array.length consonants)) in 
+        let node = create_node letter index in 
+        create_board (index-1) {nodes=(node::board.nodes);words=board.words}
       end
       else begin 
-      let letter = Array.get vowels (Random.int (Array.length vowels)) in 
-      let node = create_node letter index in 
-      create_board (index-1) {nodes=(node::board.nodes);words=board.words}
+        let letter = Array.get vowels (Random.int (Array.length vowels)) in 
+        let node = create_node letter index in 
+        create_board (index-1) {nodes=(node::board.nodes);words=board.words}
       end 
     end
   in create_board ((size*size)-1) {nodes=[];words=Trie.empty}
@@ -75,7 +77,7 @@ let generate_standard_4 =
     end 
   in create_board 15 {nodes=[];words=Trie.empty}
 
-  let node_is_letter (node:node) (letter:char) : bool = 
+let node_is_letter (node:node) (letter:char) : bool = 
   node.letter = letter
 
 let positions_of_neighbors (node:node) (board:t) : int list =
@@ -102,7 +104,7 @@ let get_node (index:int) (board:t) : node =
 
 let get_nodes (letter:char) (board:t) : node = 
   failwith "unimplemented"
-  (* List.filter (fun node -> node.letter = letter) board  *)
+(* List.filter (fun node -> node.letter = letter) board  *)
 
 let letters_of_neighbors (pos_list:int list) (board:t) : char list =
   List.map (fun x -> let node = get_node x board in node.letter) pos_list
@@ -117,59 +119,68 @@ let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
 (* returns a list of valid english words starting with the character in the node parameter *)
 let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) : string list = 
   let new_visited_pos = (node.position::visited_pos) in 
-  let new_str = str ^ Char.escaped node.letter in 
+  let new_str = str ^ (Char.escaped node.letter) in 
   if Trie.contains english_words new_str then 
     let new_board = 
       {nodes=board.nodes;words=(Trie.add_word board.words new_str)} in 
     let neighbor_positions = positions_of_neighbors node board in 
-    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
-    | [] -> acc
-    | h::t -> let neighbor_node = get_node h board in 
-      process_neighbors t ((process_node neighbor_node new_board new_str new_visited_pos)@acc)
-    in process_neighbors neighbor_positions [] 
+    let rec process_neighbors neighbor_lst (acc: string list): string list = match neighbor_lst with
+      | [] -> acc
+      | h::t -> if (List.mem h new_visited_pos = false) then 
+          (let neighbor_node = get_node h board in 
+           let updated_words = process_node neighbor_node new_board new_str new_visited_pos in 
+           process_neighbors t (updated_words @ acc)) 
+        else acc
+    in process_neighbors neighbor_positions (Trie.to_list new_board.words) 
   else 
-       let new_board = board in 
+    let new_board = board in
     let neighbor_positions = positions_of_neighbors node board in 
     let rec process_neighbors neighbor_lst acc = match neighbor_lst with
-    | [] -> acc
-    | h::t -> let neighbor_node = get_node h board in 
-      process_neighbors t ((process_node neighbor_node new_board new_str new_visited_pos)@acc)
-    in process_neighbors neighbor_positions [] 
-    
+      | [] -> acc
+      | h::t -> if (List.mem h new_visited_pos = false) then 
+          (let neighbor_node = get_node h board in 
+           let new_words = process_node neighbor_node new_board new_str new_visited_pos in 
+           process_neighbors t (new_words @ acc)) 
+        else acc
+    in process_neighbors neighbor_positions (Trie.to_list board.words) (*Converting this to a list to be able to add words*)
+
 (* returns a new board with the words attribute populated *)
-let rec populate_board_words (nodes:node list) (board:t) (word_list:string list) : string list = 
+let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   match nodes with 
   | [] -> word_list
-  | h::t -> populate_board_words t board ((process_node h board "" [])@word_list)
+  | h::t -> populate_board_words t board (Trie.add_words word_list (process_node h board "" []))
 
 let rec populate_board (board: t): t =
-  let found_words = populate_board_words board.nodes board [] in 
-  let trie = Trie.add_words board.words found_words in 
+  let trie = populate_board_words board.nodes board Trie.empty in 
+  (*let trie = Trie.add_words board.words found_words*) 
   {nodes=board.nodes;words=trie}
 
 let generate (board_type:board_type) : t = 
   match board_type with 
   | Standard size -> if size = 4 then populate_board generate_standard_4 
-  else failwith "unimplemented"
+    else raise (InvalidSize size)
   | Random size -> populate_board (generate_random size)
 
 let is_valid_word (word:string) (board:t) : bool = 
   failwith "unimplemented"
-  (* let is_valid_acc = List.exists2 node_is_letter board [word.[0]] in 
-  let rec check_neighbors (index:int) (word:string) (acc:bool) = begin
-    if index = String.length word then acc
-    else begin 
-    let nodes = get_nodes (word.[index-1]) board in 
-    let letter = word.[index] in 
-    let is_valid = is_valid_neighbor node letter board in 
-    (is_valid::acc)
-    end 
-  end 
-  in check_neighbors 1 word is_valid_acc  *)
+(* let is_valid_acc = List.exists2 node_is_letter board [word.[0]] in 
+   let rec check_neighbors (index:int) (word:string) (acc:bool) = begin
+   if index = String.length word then acc
+   else begin 
+   let nodes = get_nodes (word.[index-1]) board in 
+   let letter = word.[index] in 
+   let is_valid = is_valid_neighbor node letter board in 
+   (is_valid::acc)
+   end 
+   end 
+   in check_neighbors 1 word is_valid_acc  *)
 
 
 let word_score (word:string) (board:t) : int =
   String.length word 
+
+let get_possible_words (board:t): string list = 
+  Trie.to_list (board.words)
 
 let format (formatter:Format.formatter) (board:t) (size:int) : unit = 
   failwith "unimplemented"

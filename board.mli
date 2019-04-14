@@ -12,6 +12,9 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
+(** Raised when board size [size] is not allowed. *)
+exception InvalidSize of size 
+
 type board_type = Standard of size | Random of size 
 
 (** The desired board configuration, or the method through which the board
@@ -32,6 +35,8 @@ val is_valid_word: string -> t -> bool
     equivalent to the word length. 
     Requires: word w must be a valid word in board b. *)
 val word_score: string -> t -> int
+
+val get_possible_words: t -> string list
 
 (** [format] is a printing function suitable for use
      with the toplevel's [#install_printer] directive.

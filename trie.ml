@@ -8,7 +8,7 @@ type t = string list
 let empty = []
 
 (* let rec add_word trie word = 
-  failwith "unimplemented" *)
+   failwith "unimplemented" *)
 (* match trie with
    | Head  (children) -> begin
     match children with
@@ -27,7 +27,7 @@ let empty = []
 
 let add_word (trie:t) (word:string) : t =
   word::trie
-  (* failwith "unimplemented" *)
+(* failwith "unimplemented" *)
 
 let add_words (trie:t) (words:string list) : t =
   words@trie
@@ -39,4 +39,4 @@ let contains (trie:t) (word:string) : bool =
   List.mem word trie 
 
 let to_list (trie:t) : string list =
-  failwith "unimplemented"
+  trie
