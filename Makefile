@@ -4,8 +4,7 @@ MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=main.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind -r
-PKGS=oUnit
+OCAMLBUILD=ocamlbuild -use-ocamlfind
 
 default: build
 	utop
@@ -37,4 +36,4 @@ docs-private: build
 
 clean:
 	ocamlbuild -clean
-	rm -rf doc.public doc.private a6.zip
+	rm -rf doc.public doc.private adv.zip

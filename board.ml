@@ -1,3 +1,5 @@
+open Trie 
+
 type node = {
   letter : char;
   position : int;
@@ -14,9 +16,10 @@ type board_type = Standard of size | Random of size
 let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = Trie.empty 
+(*let english_words = add_words_from_file "english.txt"*)
 
-(* Random.int 6 *)
+let dummy_trie = Trie.empty
+let english_words = Trie.add_word dummy_trie "A"
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -72,16 +75,7 @@ let generate_standard_4 =
     end 
   in create_board 15 {nodes=[];words=Trie.empty}
 
-(* let all_board_words (board:t) =  *)
-
-
-
-let generate (board_type:board_type) : t = 
-  match board_type with 
-  | Standard size -> if size = 4 then generate_standard_4 else failwith "unimplemented"
-  | Random size -> failwith "unimplemented"
-
-let node_is_letter (node:node) (letter:char) : bool = 
+  let node_is_letter (node:node) (letter:char) : bool = 
   node.letter = letter
 
 let positions_of_neighbors (node:node) (board:t) : int list =
@@ -117,6 +111,47 @@ let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
   let pos_list = positions_of_neighbors node board in 
   let neighbors = letters_of_neighbors pos_list board in 
   List.mem letter neighbors 
+
+
+
+(* returns a list of valid english words starting with the character in the node parameter *)
+let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) : string list = 
+  let new_visited_pos = (node.position::visited_pos) in 
+  let new_str = str ^ Char.escaped node.letter in 
+  if Trie.contains english_words new_str then 
+    let new_board = 
+      {nodes=board.nodes;words=(Trie.add_word board.words new_str)} in 
+    let neighbor_positions = positions_of_neighbors node board in 
+    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
+    | [] -> acc
+    | h::t -> let neighbor_node = get_node h board in 
+      process_neighbors t ((process_node neighbor_node new_board new_str new_visited_pos)@acc)
+    in process_neighbors neighbor_positions [] 
+  else 
+       let new_board = board in 
+    let neighbor_positions = positions_of_neighbors node board in 
+    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
+    | [] -> acc
+    | h::t -> let neighbor_node = get_node h board in 
+      process_neighbors t ((process_node neighbor_node new_board new_str new_visited_pos)@acc)
+    in process_neighbors neighbor_positions [] 
+    
+(* returns a new board with the words attribute populated *)
+let rec populate_board_words (nodes:node list) (board:t) (word_list:string list) : string list = 
+  match nodes with 
+  | [] -> word_list
+  | h::t -> populate_board_words t board ((process_node h board "" [])@word_list)
+
+let rec populate_board (board: t): t =
+  let found_words = populate_board_words board.nodes board [] in 
+  let trie = Trie.add_words board.words found_words in 
+  {nodes=board.nodes;words=trie}
+
+let generate (board_type:board_type) : t = 
+  match board_type with 
+  | Standard size -> if size = 4 then populate_board generate_standard_4 
+  else failwith "unimplemented"
+  | Random size -> populate_board (generate_random size)
 
 let is_valid_word (word:string) (board:t) : bool = 
   failwith "unimplemented"
