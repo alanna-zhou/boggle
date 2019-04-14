@@ -20,10 +20,17 @@ let rec playing_game st found_wrds =
   print_endline "Enter a word";
   try  
     match Command.parse(read_line ()) with
-    |Quit -> ()
-    |Score -> print_string (string_of_int (State.score st))
-    |Help -> 
-    |Entry (guess) -> if List.mem guess found_wrds then
+    |Quit -> (); playing_game State.end_state found_wrds
+    |Score -> print_string (string_of_int (State.score st));
+      playing_game st found_wrds
+    |Help -> print_string "To enter a word, enter that word.\n
+                          To see your current score, enter #score.\n
+                          To quit/restart game, enter #quit.\n
+                          To see instructions, enter #help.";
+      playing_game st found_wrds
+
+    |Entry (guess) -> 
+      if List.mem guess found_wrds then
         print_string "This word has been guessed.";
       playing_game st found_wrds else
 if Trie.contains st.words guess then
