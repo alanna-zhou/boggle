@@ -2,19 +2,28 @@ module Trie = struct
 
   type t = Head of t list | Node of (string * t list) | Leaf ;;
 
-  let rec add_word trie word = 
-    match trie with
-    | Head  (children) -> begin
-        match children with
-        | x::xs -> begin
-            match x with
-            | Node (c, children) -> if c = (String.sub word 0 1) then
-                add_word x (String.sub word 1 (String.length word - 1))
-            | Leaf -> add_word x word
-          end
-      end
-    | Node (c, children) -> begin
-        match children with
-        | Leaf -> 
+  let rec add_word_help trie word = 
+    if word = "" then Leaf else
+    let curchar = String.sub word 0 1 in
+    let tail = String.sub word 1 ((String.length word) - 1) in 
+      match trie with
+      | Node (c, children) -> add_char children word
+      | Leaf -> Node (curchar, [add_word_help Leaf tail]) 
+      | _ -> failwith "Function does not accept Head as input"
+  and rec add_char children word =
+    if word = "" then Leaf else
+    let curchar = String.sub word 0 1 in
+    let tail = String.sub word 1 ((String.length word) - 1) in  
+    match children with
+    | (Node (c, childs))::xs -> 
+    if c = curchar then (add_word_help (Node (c, childs)) tail)::xs
+    else (Node (c, childs))::(add_char xs word)
+    | [Leaf] ->
+    | [] -> Node (curchar, add_word_help Leaf tail)
+    | _ -> failwith "Trie invalid"
 
-      end
+  let add_word trie word = 
+    match trie with
+    | Head  (children) -> add_char children word
+    | _ -> add_word_help trie word
+end
