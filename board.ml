@@ -9,6 +9,8 @@ type t = node list
 
 type board_type = Standard of size | Random of size 
 
+let alphabet = [|'A';'B';'C';'D';'E';'F';'G';'H';'I';'J';'K';'L';'M';'N';'O';'P';'Q';'R';'S';'T';'U';'V';'W';'X';'Y';'Z'|]
+
 (* Random.int 6 *)
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
@@ -37,6 +39,15 @@ let create_node (letter:char) (position:int) : node =
 let random_char die_arr (bound:int) =
   let random_int = Random.int bound in 
   Array.get die_arr random_int
+
+let generate_random (size:int) = 
+  let rec create_board (index:int) (board:t) = 
+    if index < 0 then board else begin
+      let letter = Array.get alphabet (Random.int (Array.length alphabet)) in 
+      let node = create_node letter index in 
+      create_board (index-1) (node::board)
+    end
+  in create_board ((size*size)-1) []
 
 let generate_standard_4 =
   let rec create_board (index:int) (board:t) = 
