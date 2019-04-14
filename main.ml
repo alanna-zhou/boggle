@@ -5,8 +5,6 @@ open State
 type game = {
   state : State.t;
 }
-
-
 let rec make_list lst acc=
   match lst with 
   |[]-> acc

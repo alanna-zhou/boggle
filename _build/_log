@@ -1,50 +1,18 @@
 ### Starting build.
-# Target: board.mli.depends, tags: { extension:mli, file:board.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules board.mli > board.mli.depends # cached
-# Target: board.cmi, tags: { byte, compile, extension:mli, file:board.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o board.cmi board.mli # cached
-# Target: board.ml.depends, tags: { extension:ml, file:board.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules board.ml > board.ml.depends
-# Target: board.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:board.cmo, file:board.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o board.cmo board.ml
-# Target: state.mli.depends, tags: { extension:mli, file:state.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules state.mli > state.mli.depends # cached
-# Target: state.cmi, tags: { byte, compile, extension:mli, file:state.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o state.cmi state.mli # cached
-# Target: state.ml.depends, tags: { extension:ml, file:state.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules state.ml > state.ml.depends # cached
-# Target: trie.mli.depends, tags: { extension:mli, file:trie.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules trie.mli > trie.mli.depends # cached
-# Target: trie.cmi, tags: { byte, compile, extension:mli, file:trie.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o trie.cmi trie.mli # cached
-# Target: state.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:state.cmo, file:state.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o state.cmo state.ml # cached
-# Target: main.mli.depends, tags: { extension:mli, file:main.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules main.mli > main.mli.depends # cached
-# Target: main.cmi, tags: { byte, compile, extension:mli, file:main.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o main.cmi main.mli # cached
-# Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules main.ml > main.ml.depends # cached
-# Target: command.mli.depends, tags: { extension:mli, file:command.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules command.mli > command.mli.depends # cached
-# Target: command.cmi, tags: { byte, compile, extension:mli, file:command.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o command.cmi command.mli # cached
-# Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o main.cmo main.ml # cached
-# Target: authors.mli.depends, tags: { extension:mli, file:authors.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules authors.mli > authors.mli.depends # cached
-# Target: authors.cmi, tags: { byte, compile, extension:mli, file:authors.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -o authors.cmi authors.mli # cached
-# Target: authors.ml.depends, tags: { extension:ml, file:authors.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules authors.ml > authors.ml.depends # cached
-# Target: authors.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:authors.cmo, file:authors.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o authors.cmo authors.ml # cached
-# Target: command.ml.depends, tags: { extension:ml, file:command.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules command.ml > command.ml.depends # cached
-# Target: command.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:command.cmo, file:command.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o command.cmo command.ml # cached
-# Target: trie.ml.depends, tags: { extension:ml, file:trie.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules trie.ml > trie.ml.depends # cached
-# Target: trie.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:trie.cmo, file:trie.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o trie.cmo trie.ml # cached
-# Compilation successful.
+# Target: board.mli.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:mli, file:board.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules board.mli > board.mli.depends
+# Target: trie.mli.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:mli, file:trie.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules trie.mli > trie.mli.depends
+# Target: trie.cmi, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:mli, file:trie.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o trie.cmi trie.mli
+# Target: board.cmi, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:mli, file:board.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmi board.mli
+# Target: board.ml.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:ml, file:board.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules board.ml > board.ml.depends
+# Target: board.cmo, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:cmo, extension:ml, file:board.cmo, file:board.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmo board.ml
++ ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o board.cmo board.ml
+File "board.ml", line 9, characters 10-16:
+Error: Unbound type constructor Trie.t
+Command exited with code 2.
+# Compilation unsuccessful.
