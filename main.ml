@@ -25,25 +25,26 @@ let rec playing_game st found_wrds =
     |Failure x -> print_endline "This is not a valid input."; 
       (playing_game st found_wrds)
   else  
-    try print_string ("Words found: \n" ^ (make_list found_wrds "")^ "\n Enter a word");
-      match Command.parse(read_line ()) with
-      |Empty -> print_string("Word is already guessed.") ;
-        playing_game st found_wrds
-      |Quit -> playing_game State.end_state found_wrds
-      |Score -> print_string (string_of_int (State.score st));
-        playing_game st found_wrds
-      |Help -> print_string "To enter a word, enter that word.\n
+    Board.format (State.board st) (Board.size State.board)
+      try print_string ("Words found: \n" ^ (make_list found_wrds "")^ "\n Enter a word");
+        match Command.parse(read_line ()) with
+        |Empty -> print_string("Word is already guessed.") ;
+          playing_game st found_wrds
+        |Quit -> playing_game State.end_state found_wrds
+        |Score -> print_string (string_of_int (State.score st));
+          playing_game st found_wrds
+        |Help -> print_string "To enter a word, enter that word.\n
                           To see your current score, enter #score.\n
                           To quit/restart game, enter #quit.\n
                           To see instructions, enter #help.";
-        playing_game st found_wrds
-      |Entry (guess) -> 
-        if (List.mem guess found_wrds)
-        then playing_game st found_wrds
-        else (playing_game (State.update st guess) (guess :: found_wrds))
-    with 
-    |Failure x -> print_endline "This is not a valid input."; 
-      (playing_game st found_wrds)
+          playing_game st found_wrds
+        |Entry (guess) -> 
+          if (List.mem guess found_wrds)
+          then playing_game st found_wrds
+          else (playing_game (State.update st guess) (guess :: found_wrds))
+      with 
+      |Failure x -> print_endline "This is not a valid input."; 
+        (playing_game st found_wrds)
 
 let rec main () =
   print_string "Welcome to Boggle.\n";
