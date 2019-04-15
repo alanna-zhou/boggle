@@ -130,38 +130,36 @@ let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
   List.mem letter neighbors 
 
 (* returns a list of valid english words starting with the character in the node parameter *)
-let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) : string list = 
+let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) (words_acc:string list): string list = 
   let new_visited_pos = (node.position::visited_pos) in 
   let new_str = str ^ (Char.escaped node.letter) in 
   if Trie.contains english_words new_str then 
-    let new_board = 
-      {nodes=board.nodes;words=(Trie.add_word board.words new_str)} in 
+    let words_acc = new_str::words_acc in 
     let neighbor_positions = positions_of_neighbors node board in 
-    let rec process_neighbors neighbor_lst (acc: string list): string list = match neighbor_lst with
+    let rec process_neighbors neighbor_lst (acc:string list): string list = match neighbor_lst with
       | [] -> acc
       | h::t -> if (List.mem h new_visited_pos = false) then 
           (let neighbor_node = get_node h board in 
-           let updated_words = process_node neighbor_node new_board new_str new_visited_pos in 
+           let updated_words = process_node neighbor_node board new_str new_visited_pos acc in 
            process_neighbors t (updated_words @ acc)) 
         else process_neighbors t acc
-    in process_neighbors neighbor_positions (Trie.to_list new_board.words) 
+    in process_neighbors neighbor_positions words_acc 
   else 
-    let new_board = board in
     let neighbor_positions = positions_of_neighbors node board in 
     let rec process_neighbors neighbor_lst acc = match neighbor_lst with
       | [] -> acc
       | h::t -> if (List.mem h new_visited_pos = false) then 
           (let neighbor_node = get_node h board in 
-           let new_words = process_node neighbor_node new_board new_str new_visited_pos in 
+           let new_words = process_node neighbor_node board new_str new_visited_pos acc in 
            process_neighbors t (new_words @ acc)) 
         else process_neighbors t acc
-    in process_neighbors neighbor_positions (Trie.to_list board.words) (*Converting this to a list to be able to add words*)
+    in process_neighbors neighbor_positions words_acc (*Converting this to a list to be able to add words*)
 
 (* returns a new board with the words attribute populated *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   match nodes with 
   | [] -> word_list
-  | h::t -> populate_board_words t board (Trie.add_words word_list (process_node h board "" []))
+  | h::t -> populate_board_words t board (Trie.add_words word_list (process_node h board "" [] []))
 
 let rec populate_board (board:t) : t =
   let trie = populate_board_words board.nodes board Trie.empty in 
