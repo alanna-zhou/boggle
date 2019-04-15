@@ -28,12 +28,15 @@ let node6 = {letter='G';position=6}
 let node7 = {letter='S';position=7}
 let node8 = {letter='E';position=8}
 
+
+let b = {nodes=[node0;node1;node2;node3];words=Trie.empty}
+
 let testing = {nodes=[node0;node1;node2;node3;node4;node5;node6;node7;node8];words=Trie.empty}
 
 (*let english_words = add_words_from_file "english.txt"*)
 
 let dummy_trie = Trie.empty
-let english_words = Trie.add_words dummy_trie ["BAD";"BEG";"BEE";"SEE";"FEED"]
+let english_words = Trie.add_words dummy_trie ["BAD";"BADE";"BA";"BEG";"BEE";"SEE";"FEED"]
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -140,7 +143,7 @@ let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) :
           (let neighbor_node = get_node h board in 
            let updated_words = process_node neighbor_node new_board new_str new_visited_pos in 
            process_neighbors t (updated_words @ acc)) 
-        else acc
+        else process_neighbors t acc
     in process_neighbors neighbor_positions (Trie.to_list new_board.words) 
   else 
     let new_board = board in
@@ -151,7 +154,7 @@ let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) :
           (let neighbor_node = get_node h board in 
            let new_words = process_node neighbor_node new_board new_str new_visited_pos in 
            process_neighbors t (new_words @ acc)) 
-        else acc
+        else process_neighbors t acc
     in process_neighbors neighbor_positions (Trie.to_list board.words) (*Converting this to a list to be able to add words*)
 
 (* returns a new board with the words attribute populated *)
