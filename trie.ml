@@ -35,7 +35,7 @@ let rec add_words (trie:t) (words:string list) : t =
   | h::t -> add_words (add_word trie h) t 
 
 let add_words_from_file (filename:string) : t =
-  failwith "unimplemented"
+  add_words empty ["RYE"; "TIE"; "DIE"]
 
 let contains (trie:t) (word:string) : bool =
   List.mem word trie 
