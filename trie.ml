@@ -26,11 +26,13 @@ let empty = []
    end *)
 
 let add_word (trie:t) (word:string) : t =
-  word::trie
+  if List.mem word trie then trie else word::trie
 (* failwith "unimplemented" *)
 
-let add_words (trie:t) (words:string list) : t =
-  words@trie
+let rec add_words (trie:t) (words:string list) : t =
+  match words with 
+  | [] -> trie
+  | h::t -> add_words (add_word trie h) t 
 
 let add_words_from_file (filename:string) : t =
   failwith "unimplemented"
