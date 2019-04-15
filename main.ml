@@ -11,8 +11,8 @@ let rec make_list lst acc=
   |h::t-> make_list t (h ^ "; " ^ acc)
 
 let rec playing_game st found_wrds =
-  if State.is_end st
-  then 
+  (*if State.is_end st
+    then 
     try print_string("Game Over \n Your score: " ^ 
                      (string_of_int (State.score st)) ^ "\n Play again? y/n \n"); 
       match read_line () with
@@ -24,7 +24,7 @@ let rec playing_game st found_wrds =
     with 
     |Failure x -> print_endline "This is not a valid input."; 
       (playing_game st found_wrds)
-  else  
+    else  
     Board.format (State.board st) (Board.size State.board)
       try print_string ("Words found: \n" ^ (make_list found_wrds "")^ "\n Enter a word");
         match Command.parse(read_line ()) with
@@ -44,13 +44,14 @@ let rec playing_game st found_wrds =
           else (playing_game (State.update st guess) (guess :: found_wrds))
       with 
       |Failure x -> print_endline "This is not a valid input."; 
-        (playing_game st found_wrds)
+        (playing_game st found_wrds)*)
+  failwith "unimplemented"
 
 let rec main () =
-  print_string "Welcome to Boggle.\n";
-  print_endline "What size board would you like to play with?";
-  print_string  "Side length> "; 
-  try
+  (*print_string "Welcome to Boggle.\n";
+    print_endline "What size board would you like to play with?";
+    print_string  "Side length> "; 
+    try
     let side = int_of_string(read_line ()) in 
     print_endline "What kind of board would you like?";
     print_string  "Type s for Standard and r for Random> "; 
@@ -58,6 +59,6 @@ let rec main () =
     |"s" -> playing_game (State.init (Board.generate (Standard side))) []
     |"r" -> playing_game (State.init (Board.generate (Random side))) []
     |_-> print_endline "Invalid entry"; main ()
-  with 
-  |Failure x-> print_endline "Invalid side length." ; main ()
+    with 
+    |Failure x-> print_endline "Invalid side length." ; main ()*) failwith "unimplemented"
 
