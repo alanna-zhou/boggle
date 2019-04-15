@@ -12,6 +12,7 @@ let suite = "test suite for A6" >::: List.flatten [
   ]
 
 let board = generate (Standard 4) 
+let () = format board 4
 let () = print_list (get_possible_words board)
 
 

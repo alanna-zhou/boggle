@@ -42,7 +42,7 @@ val get_possible_words: t -> string list
      with the toplevel's [#install_printer] directive.
      It outputs a textual representation of a board
      on the given formatter. *)
-val format : Format.formatter -> t -> size -> unit
+val format : t -> size -> unit 
 
 
 

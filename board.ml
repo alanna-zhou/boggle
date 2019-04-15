@@ -182,5 +182,15 @@ let word_score (word:string) (board:t) : int =
 let get_possible_words (board:t): string list = 
   Trie.to_list (board.words)
 
-let format (formatter:Format.formatter) (board:t) (size:int) : unit = 
-  failwith "unimplemented"
+
+let rec format board size = 
+  match board.nodes with
+  | [] -> ()
+  | h::t -> begin
+      let () = if (h.position + 1) mod size = 0 then (print_char h.letter ; 
+                                                      print_string " " ; 
+                                                      print_string "\n") else 
+          (print_char h.letter; print_string " ") in (format {board with nodes=t} size)
+    end 
+
+
