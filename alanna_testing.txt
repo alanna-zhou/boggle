@@ -1,0 +1,8 @@
+#use "board.ml";;
+let q = Queue.create ();;
+Queue.add node0 q;;
+let visited = Array.make 4 false;;
+visited.(0) <- true;;
+#trace process_neighbors;;
+let p = process_neighbors q node0 b "B" Trie.empty visited [1;2;3];;
+Trie.to_list p;;

@@ -36,7 +36,7 @@ let testing = {nodes=[node0;node1;node2;node3;node4;node5;node6;node7;node8];wor
 (*let english_words = add_words_from_file "english.txt"*)
 
 let dummy_trie = Trie.empty
-let english_words = Trie.add_words dummy_trie ["BAD";"BADE";"BA";"BEG";"BEE";"SEE";"FEED"]
+let english_words = Trie.add_words dummy_trie ["BAD";"BADE";"BA";"BAE";"B";"BEG";"BEE";"SEE";"FEED"]
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -129,37 +129,50 @@ let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
   let neighbors = letters_of_neighbors pos_list board in 
   List.mem letter neighbors 
 
-(* returns a list of valid english words starting with the character in the node parameter *)
-let rec process_node (node:node) (board:t) (str:string) (visited_pos:int list) (words_acc:string list): string list = 
-  let new_visited_pos = (node.position::visited_pos) in 
+let rec process_neighbors q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited (neighbors_lst:int list) : Trie.t = 
+  match neighbors_lst with 
+  | [] -> words_acc
+  | pos::t -> begin
+    if visited.(pos) = false then begin 
+      let neighbor = get_node pos board in 
+      let dummy = Queue.add neighbor q in 
+      let dummy1 = visited.(pos) <- true in 
+      let new_str = str ^ (Char.escaped neighbor.letter) in 
+      if Trie.contains english_words new_str then 
+      let words_acc = Trie.add_word words_acc new_str in 
+      process_queue q node board new_str words_acc visited
+      else process_queue q node board new_str words_acc visited
+        end
+    else process_neighbors q node board str words_acc visited t 
+  end 
+
+and process_queue q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited : Trie.t = 
   let new_str = str ^ (Char.escaped node.letter) in 
   if Trie.contains english_words new_str then 
-    let words_acc = new_str::words_acc in 
-    let neighbor_positions = positions_of_neighbors node board in 
-    let rec process_neighbors neighbor_lst (acc:string list): string list = match neighbor_lst with
-      | [] -> acc
-      | h::t -> if (List.mem h new_visited_pos = false) then 
-          (let neighbor_node = get_node h board in 
-           let updated_words = process_node neighbor_node board new_str new_visited_pos acc in 
-           process_neighbors t (updated_words @ acc)) 
-        else process_neighbors t acc
-    in process_neighbors neighbor_positions words_acc 
+    let words_acc = Trie.add_word words_acc str in 
+    if Queue.is_empty q then words_acc else
+    let u = Queue.take q in 
+    let neighbor_positions = positions_of_neighbors u board in 
+    process_neighbors q node board str words_acc visited neighbor_positions
   else 
-    let neighbor_positions = positions_of_neighbors node board in 
-    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
-      | [] -> acc
-      | h::t -> if (List.mem h new_visited_pos = false) then 
-          (let neighbor_node = get_node h board in 
-           let new_words = process_node neighbor_node board new_str new_visited_pos acc in 
-           process_neighbors t (new_words @ acc)) 
-        else process_neighbors t acc
-    in process_neighbors neighbor_positions words_acc (*Converting this to a list to be able to add words*)
+  if Queue.is_empty q then words_acc else
+    let u = Queue.take q in 
+    let neighbor_positions = positions_of_neighbors u board in 
+    process_neighbors q node board str words_acc visited neighbor_positions
 
+(* returns a list of valid english words starting with the character in the node parameter *)
+let rec process_node (node:node) (board:t) (str:string) (words_acc:Trie.t): Trie.t = 
+  let visited = Array.make (List.length board.nodes) false in 
+  let q = Queue.create () in 
+  let dummy = visited.(node.position) <- true in 
+  let dummy1 = Queue.add node q in 
+  process_queue q node board str words_acc visited 
+    
 (* returns a new board with the words attribute populated *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   match nodes with 
   | [] -> word_list
-  | h::t -> populate_board_words t board (Trie.add_words word_list (process_node h board "" [] []))
+  | h::t -> populate_board_words t board (Trie.combine word_list (process_node h board "" Trie.empty))
 
 let rec populate_board (board:t) : t =
   let trie = populate_board_words board.nodes board Trie.empty in 
