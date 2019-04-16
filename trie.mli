@@ -14,5 +14,9 @@ val add_words_from_file : string -> t
   [trie]*)
 val contains : t -> string -> bool
 
+(** [contains_prefix trie pref] is whether or not a word with prefix [pref]
+  has been added to [trie]*)
+val contains_prefix : t -> string -> bool
+
 (** [to_list trie] is [trie] in the form of an ordered string list*)
 val to_list : t -> string list
