@@ -14,5 +14,13 @@ let init (board:Board.t) : t =
 let score (state:t) : int = 
   state.score
 
+let board (state:t) : Board.t = 
+  state.board
+
 let update (state:t) (word:string) : t =
-  failwith "unimplemented"
+  if Board.is_valid_word word state.board then 
+    let new_words = Trie.add_word state.words word in 
+    let word_score = Board.word_score word state.board in 
+    let new_score = state.score + word_score in 
+    {board=state.board;score=new_score;words=new_words}
+  else state

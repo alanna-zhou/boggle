@@ -1,0 +1,37 @@
+TESTING PROCESS_NEIGHBORS WITH BOARD "B"
+#use "board.ml";;
+let q = Queue.create ();;
+Queue.add node0 q;;
+let visited = Array.make 4 false;;
+visited.(0) <- true;;
+#trace process_neighbors;;
+let p = process_neighbors q node0 b "B" Trie.empty visited [1;2;3];;
+Trie.to_list p;;
+
+TESTING PROCESS_QUEUE WITH BOARD "B"
+#use "board.ml";;
+let q = Queue.create ();;
+Queue.add node0 q;;
+let visited = Array.make 4 false;;
+visited.(0) <- true;;
+let p1 = process_queue q node0 b "B" Trie.empty visited;;
+Trie.to_list p1;;
+
+TESTING PROCESS_NODE WITH BOARD "B"
+#use "board.ml";;
+let q = Queue.create ();;
+Queue.add node0 q;;
+let visited = Array.make 4 false;;
+visited.(0) <- true;;
+let n = process_node node0 b "" Trie.empty;;
+Trie.to_list n;;
+
+TESTING PROCESS_NEIGHBORS WITH BOARD "TESTING"
+#use "board.ml";;
+let q = Queue.create ();;
+Queue.add node0 q;;
+let visited = Array.make 16 false;;
+visited.(0) <- true;;
+#trace process_neighbors;;
+let p = process_neighbors q node0 testing "B" Trie.empty visited [1;2;3];;
+Trie.to_list p;;
