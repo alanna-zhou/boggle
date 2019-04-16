@@ -15,7 +15,8 @@ type t = {
 
 type board_type = Standard of size | Random of size 
 
-let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
+let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
+                   'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
 let node0 = {letter='B';position=0}
@@ -55,8 +56,11 @@ let die_13 = [|'R';'A';'L';'E';'S';'C'|]
 let die_14 = [|'U';'W';'I';'L';'R';'G'|]
 let die_15 = [|'P';'A';'C';'E';'M';'D'|]
 
-let standard_4 = [|die_0;die_1;die_2;die_3;die_4;die_5;die_6;die_7;die_8;die_9;die_10;die_11;die_12;die_13;die_14;die_15;|]
+let standard_4 = [|die_0;die_1;die_2;die_3;die_4;die_5;die_6;die_7;die_8;
+                   die_9;die_10;die_11;die_12;die_13;die_14;die_15;|]
 
+(** [create_node l p] creates a node, to be placed in a board, with
+    the field letter set as l and position set as p. *)
 let create_node (letter:char) (position:int) : node = 
   {letter= letter; position=position}
 
@@ -65,12 +69,17 @@ let random_char die_arr (bound:int) =
   let random_int = Random.int bound in 
   Array.get die_arr random_int
 
+let size board = 
+  int_of_float (sqrt (float_of_int (List.length (board.nodes))))
+
+(** [generate_random size] generates a random board of dimensions size x size.*)
 let generate_random (size:int) = 
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
       let zero_or_one = Random.int 2 in 
       if zero_or_one = 0 then begin
-        let letter = Array.get consonants (Random.int (Array.length consonants)) in 
+        let letter = Array.get consonants (Random.int (Array.length consonants)) 
+        in 
         let node = create_node letter index in 
         create_board (index-1) {nodes=(node::board.nodes);words=board.words}
       end
@@ -82,6 +91,8 @@ let generate_random (size:int) =
     end
   in create_board ((size*size)-1) {nodes=[];words=Trie.empty}
 
+(** [generate_standard_4] generates a 4x4 standard board using preconfigured 
+    die.*)
 let generate_standard_4 =
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
@@ -92,42 +103,43 @@ let generate_standard_4 =
     end 
   in create_board 15 {nodes=[];words=Trie.empty}
 
-let node_is_letter (node:node) (letter:char) : bool = 
-  node.letter = letter
-
+(**[positions of neighbors node b] returns the list of positions of 
+   neighboring elements on the board. *)
 let positions_of_neighbors (node:node) (board:t) : int list =
-  let size = int_of_float (Pervasives.sqrt ((float_of_int ((List.length board.nodes)+1)))) in 
+  let size = int_of_float 
+      (Pervasives.sqrt ((float_of_int ((List.length board.nodes)+1)))) in 
   let pos = node.position in 
   if (pos mod size) = 0 then begin 
-    List.filter (fun x -> x >= 0 && x < (size*size)) [pos+size;pos-size;pos+1;pos+size+1;pos-size+1]
+    List.filter (fun x -> x >= 0 && x < (size*size)) 
+      [pos+size;pos-size;pos+1;pos+size+1;pos-size+1]
   end 
   else if (pos mod size) = (size-1) then begin
-    List.filter (fun x -> x >= 0 && x < (size*size)) [pos-size;pos-1;pos-size-1;pos+size-1;pos+size]
+    List.filter (fun x -> x >= 0 && x < (size*size)) 
+      [pos-size;pos-1;pos-size-1;pos+size-1;pos+size]
   end 
   else if (pos / size) = 0 then begin
-    List.filter (fun x -> x >= 0 && x < (size*size)) [pos+size;pos-1;pos+1;pos+size+1;pos+size-1] 
+    List.filter (fun x -> x >= 0 && x < (size*size)) 
+      [pos+size;pos-1;pos+1;pos+size+1;pos+size-1] 
   end 
   else if (pos / size) = (size-1) then begin
-    List.filter (fun x -> x >= 0 && x < (size*size)) [pos-size;pos-size-1;pos+1;pos-1;pos-size+1] 
+    List.filter (fun x -> x >= 0 && x < (size*size)) 
+      [pos-size;pos-size-1;pos+1;pos-1;pos-size+1] 
   end 
   else begin 
-    List.filter (fun x -> x >= 0 && x < (size*size)) [pos-size;pos-size-1;pos+size-1;pos+1;pos-1;pos+size+1;pos-size+1;pos+size] 
+    List.filter (fun x -> x >= 0 && x < (size*size)) 
+      [pos-size;pos-size-1;pos+size-1;pos+1;pos-1;pos+size+1;pos-size+1;
+       pos+size] 
   end 
 
+(** [get_node index board] returns the node with index [index] in [board]'s
+    node list.*)
 let get_node (index:int) (board:t) : node = 
   List.nth board.nodes index
 
-let get_nodes (letter:char) (board:t) : node = 
-  failwith "unimplemented"
-(* List.filter (fun node -> node.letter = letter) board  *)
-
+(** [letters_of_neighbors pos_list b] returns the list of letters of all nodes
+    with the corresponding positions in pos_list *)
 let letters_of_neighbors (pos_list:int list) (board:t) : char list =
   List.map (fun x -> let node = get_node x board in node.letter) pos_list
-
-let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
-  let pos_list = positions_of_neighbors node board in 
-  let neighbors = letters_of_neighbors pos_list board in 
-  List.mem letter neighbors 
 
 let rec process_neighbors q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited (neighbors_lst:int list) : Trie.t = 
   match neighbors_lst with 
@@ -177,12 +189,31 @@ let rec populate_board (board:t) : t =
 
 let generate (board_type:board_type) : t = 
   match board_type with 
-  | Standard size -> if size = 4 then populate_board generate_standard_4 
+  | Standard size -> if size =4 then generate_standard_4 
     else raise (InvalidSize size)
-  | Random size -> populate_board (generate_random size)
+  | Random size -> (generate_random size)
 
+(** [get_node_letter l lst acc] filters the node list [lst] and returns a
+    only the nodes containing letter [l]. *)
+let rec get_node_letter letter board_nodes acc =
+  match board_nodes with
+  | [] -> acc
+  | h::t -> if (h.letter = letter) then (get_node_letter letter t (h::acc)) 
+    else (get_node_letter letter t acc)
+
+(** [is_valid_word w b] returns true if [w] is contained in the english
+    dictionary and could be formed following the rules on board [b], and false
+    otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  Trie.contains board.words word
+  if Trie.contains english_words word then begin 
+    let first_char = word.[0] in 
+    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+    let rec node_loop lst acc = 
+      match lst with
+      | [] -> acc
+      | h :: t -> node_loop t (acc || process_node h 0 board word []) in
+    (node_loop nodes_fst_letter false)
+  end else false
 
 let word_score (word:string) (board:t) : int =
   String.length word 
@@ -190,15 +221,16 @@ let word_score (word:string) (board:t) : int =
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
 
-
 let rec format board size = 
   match board.nodes with
   | [] -> ()
   | h::t -> begin
-      let () = if (h.position + 1) mod size = 0 then (print_char h.letter ; 
-                                                      print_string " " ; 
-                                                      print_string "\n") else 
-          (print_char h.letter; print_string " ") in (format {board with nodes=t} size)
+      let () = if (h.position + 1) mod size = 0 then begin
+          (print_char h.letter ; print_string " " ; print_string "\n")
+        end else 
+          (print_char h.letter; print_string " ") in 
+      (format {board with nodes=t} size)
     end 
+
 
 

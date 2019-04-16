@@ -8,9 +8,6 @@ type command =
 (**Raised when an empty command is parsed *)
 exception Empty
 
-(**Raised when an invalid command is parsed *)
-exception Invalid
-
 (**[parse str] is a command associated with [str]
 
     Requires: [str] is a valid string

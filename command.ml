@@ -7,8 +7,6 @@ type command =
 
 exception Empty
 
-exception Invalid
-
 let parse str = 
   match (String.trim str) with
   |""-> raise Empty
