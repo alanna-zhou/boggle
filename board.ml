@@ -153,7 +153,7 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
     let new_nodes = n_node::node_lst in 
     let new_str = str^Char.escaped n_node.letter in 
     let words_acc = Trie.add_word words_acc new_str in 
-    let dummy = Queue.add new_nodes q in 
+    let () = Queue.add new_nodes q in 
     process_neighbors q node_lst str board words_acc t
   end 
 
@@ -169,11 +169,11 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
 (* returns a list of valid english words starting with the character in the node parameter *)
 let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
   let q = Queue.create () in 
-  let dummy = List.map (fun x -> Queue.add x q) nodes in 
-  (* let dummy = Queue.add nodes q in  *)
-  process_queue q board words_acc  
+  match List.map (fun x -> Queue.add x q) nodes with
+  | [] -> process_queue q board words_acc  
+  | h::t -> process_queue q board words_acc  
     
-(* helper function for [populate_board] to start the BFS algorithm on the ndoes of the board *)
+(* helper function for [populate_board] to start the BFS algorithm on the ndoes of the board. since [process_node] takes in a list of nodes as each vertex for its BFS traversal, this function accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 
   process_node nodes_for_q board Trie.empty
@@ -181,12 +181,11 @@ let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Tr
 (* actually populates the board with all the possible words that it can form *)
 let rec populate_board (board:t) : t =
   let trie = populate_board_words board.nodes board Trie.empty in 
-  (*let trie = Trie.add_words board.words found_words*) 
   {nodes=board.nodes;words=trie}
 
 let generate (board_type:board_type) : t = 
   match board_type with 
-  | Standard size -> if size =4 then generate_standard_4 
+  | Standard size -> if size = 4 then generate_standard_4 
     else raise (InvalidSize size)
   | Random size -> (generate_random size)
 
