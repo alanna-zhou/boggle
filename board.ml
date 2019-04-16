@@ -123,6 +123,66 @@ let get_node (index:int) (board:t) : node =
 let letters_of_neighbors (pos_list:int list) (board:t) : char list =
   List.map (fun x -> let node = get_node x board in node.letter) pos_list
 
+(* Gets the neighboring nodes *)
+let nodes_of_neighbors (node:node) (board:t) : node list =
+  let neighbor_positions = positions_of_neighbors node board in 
+  let rec rec_nodes positions acc =
+    match positions with 
+    | [] -> acc 
+    | h::t -> rec_nodes t ((get_node h board)::acc)
+  in rec_nodes neighbor_positions []
+
+(* Given a list of nodes, this will return the string formed by the nodes (but in reverse order) *)
+let get_string_from_nodes (nodes:node list) : string = 
+  let char_array = List.map (fun x -> x.letter) nodes in 
+  let string_array = List.map (fun x -> Char.escaped x) char_array in 
+  List.fold_left (fun acc x -> x^acc) "" string_array
+
+(* sequence of nodes; gets neighbors of last node in the sequence, and then subtracts from these neighbors any nodes that are already present in the sequence *)
+let get_BFS_neighbors (nodes:node list) board : node list =
+  match nodes with
+  | [] -> []
+  | last_node::t -> let neighbor_nodes = nodes_of_neighbors last_node board in
+    List.filter (fun x -> not (List.mem x nodes)) neighbor_nodes 
+
+(* only adds one letter to the node_lst, for example, if the queue passed in "ABC" then this would only process one valid neighboring character, like "ABCD," "ABCE", "ABCF" ... and so on. *)
+let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_acc:Trie.t) (neighbor_nodes:node list) : Trie.t = 
+  match neighbor_nodes with 
+  | [] -> process_queue q board words_acc 
+  | n_node::t -> begin 
+    let new_nodes = n_node::node_lst in 
+    let new_str = str^Char.escaped n_node.letter in 
+    let words_acc = Trie.add_word words_acc new_str in 
+    let dummy = Queue.add new_nodes q in 
+    process_neighbors q node_lst str board words_acc t
+  end 
+
+(* processes the entire queue holding all of the possible node sequences; essentially a loop for while the queue isn't empty *)
+and process_queue q (board:t) (words_acc:Trie.t) : Trie.t = 
+    if Queue.is_empty q then words_acc else
+    let node_lst = Queue.take q in 
+    let neighbor_nodes = get_BFS_neighbors node_lst board in 
+    let new_str = get_string_from_nodes node_lst in 
+    let words_acc = Trie.add_word words_acc new_str in 
+    process_neighbors q node_lst new_str board words_acc neighbor_nodes
+ 
+(* returns a list of valid english words starting with the character in the node parameter *)
+let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
+  let q = Queue.create () in 
+  let dummy = List.map (fun x -> Queue.add x q) nodes in 
+  (* let dummy = Queue.add nodes q in  *)
+  process_queue q board words_acc  
+    
+(* helper function for [populate_board] to start the BFS algorithm on the ndoes of the board *)
+let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
+  let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 
+  process_node nodes_for_q board Trie.empty
+
+(* actually populates the board with all the possible words that it can form *)
+let rec populate_board (board:t) : t =
+  let trie = populate_board_words board.nodes board Trie.empty in 
+  (*let trie = Trie.add_words board.words found_words*) 
+  {nodes=board.nodes;words=trie}
 
 let generate (board_type:board_type) : t = 
   match board_type with 
@@ -138,11 +198,11 @@ let rec get_node_letter letter board_nodes acc =
   | h::t -> if (h.letter = letter) then (get_node_letter letter t (h::acc)) 
     else (get_node_letter letter t acc)
 
-(** [process_node node idx b str] does a depth first search for word [str] 
+(** [validate_node node idx b str] does a depth first search for word [str] 
     in board [b], starting from node [node]. Returns true if [str] was found
     looking horizontally, vertically, and diagonally searching from the starting
     point, and returns false if not. *)
-let rec process_node (node:node) (index:int) (board:t) (str:string) 
+let rec validate_node (node:node) (index:int) (board:t) (str:string) 
     (visited_pos:int list) : bool = 
   let new_visited_pos = (node.position::visited_pos) in 
   if index = String.length str - 1 then true else begin
@@ -155,7 +215,7 @@ let rec process_node (node:node) (index:int) (board:t) (str:string)
       | [] -> acc
       | h::t -> begin
           if (List.mem h new_visited_pos = false) then begin
-            process_neighbors t (process_node (get_node h board) 
+            process_neighbors t (validate_node (get_node h board) 
                                    (index + 1) board str new_visited_pos)
           end else process_neighbors t acc
         end in 
@@ -172,7 +232,7 @@ let is_valid_word (word:string) (board:t) : bool =
     let rec node_loop lst acc = 
       match lst with
       | [] -> acc
-      | h :: t -> node_loop t (acc || process_node h 0 board word []) in
+      | h :: t -> node_loop t (acc || validate_node h 0 board word []) in
     (node_loop nodes_fst_letter false)
   end else false
 
