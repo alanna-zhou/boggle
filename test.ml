@@ -19,4 +19,8 @@ let suite = "test suite for A6" >::: List.flatten [
     state_tests
   ]
 
+let board = generate (Standard 4) 
+let x = is_valid_word "hi" board 
+let () = if x = true then print_string "true \n" else print_string "false \n"
+let () = format board 4
 let _ = run_test_tt_main suite

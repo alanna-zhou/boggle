@@ -37,9 +37,6 @@ let rec add_words (trie:t) (words:string list) : t =
 let add_words_from_file (filename:string) : t =
   add_words empty ["RYE"; "TIE"; "DIE"]
 
-let combine (trie1:t) (trie2:t) : t =
-  trie1 @ trie2
-
 let contains (trie:t) (word:string) : bool =
   List.mem word trie 
 

@@ -19,25 +19,7 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let node0 = {letter='B';position=0}
-let node1 = {letter='A';position=1}
-let node2 = {letter='D';position=2}
-let node3 = {letter='E';position=3}
-let node4 = {letter='E';position=4}
-let node5 = {letter='F';position=5}
-let node6 = {letter='G';position=6}
-let node7 = {letter='S';position=7}
-let node8 = {letter='E';position=8}
-
-
-let b = {nodes=[node0;node1;node2;node3];words=Trie.empty}
-
-let testing = {nodes=[node0;node1;node2;node3;node4;node5;node6;node7;node8];words=Trie.empty}
-
-(*let english_words = add_words_from_file "english.txt"*)
-
-let dummy_trie = Trie.empty
-let english_words = Trie.add_words dummy_trie ["BAD";"BADE";"BA";"BAE";"B";"BEG";"BEE";"SEE";"FEED"]
+let english_words = add_words_from_file "english.txt"
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -141,51 +123,6 @@ let get_node (index:int) (board:t) : node =
 let letters_of_neighbors (pos_list:int list) (board:t) : char list =
   List.map (fun x -> let node = get_node x board in node.letter) pos_list
 
-let rec process_neighbors q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited (neighbors_lst:int list) : Trie.t = 
-  match neighbors_lst with 
-  | [] -> process_queue q node board str words_acc visited
-  | pos::t -> begin
-    if visited.(pos) = false then begin 
-      let neighbor = get_node pos board in 
-      let dummy = Queue.add neighbor q in 
-      let dummy1 = visited.(pos) <- true in 
-      let new_str = str ^ (Char.escaped neighbor.letter) in 
-      if 1 = 1 then 
-      (* if Trie.contains english_words new_str then  *)
-      let words_acc = Trie.add_word words_acc new_str in 
-      (* process_neighbors q node board new_str words_acc visited t *)
-      process_queue q node board new_str words_acc visited
-      else 
-      (* process_neighbors q node board new_str words_acc visited t  *)
-      process_queue q node board new_str words_acc visited
-        end
-    else process_neighbors q node board str words_acc visited t 
-  end 
-
-and process_queue q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited : Trie.t = 
-    if Queue.is_empty q then words_acc else
-    let u = Queue.take q in 
-    let neighbor_positions = positions_of_neighbors u board in 
-    process_neighbors q node board str words_acc visited neighbor_positions
- 
-(* returns a list of valid english words starting with the character in the node parameter *)
-let rec process_node (node:node) (board:t) (str:string) (words_acc:Trie.t): Trie.t = 
-  let visited = Array.make (List.length board.nodes) false in 
-  let q = Queue.create () in 
-  let dummy = visited.(node.position) <- true in 
-  let dummy1 = Queue.add node q in 
-  process_queue q node board str words_acc visited 
-    
-(* returns a new board with the words attribute populated *)
-let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
-  match nodes with 
-  | [] -> word_list
-  | h::t -> populate_board_words t board (Trie.combine word_list (process_node h board "" Trie.empty))
-
-let rec populate_board (board:t) : t =
-  let trie = populate_board_words board.nodes board Trie.empty in 
-  (*let trie = Trie.add_words board.words found_words*) 
-  {nodes=board.nodes;words=trie}
 
 let generate (board_type:board_type) : t = 
   match board_type with 
@@ -201,6 +138,30 @@ let rec get_node_letter letter board_nodes acc =
   | h::t -> if (h.letter = letter) then (get_node_letter letter t (h::acc)) 
     else (get_node_letter letter t acc)
 
+(** [process_node node idx b str] does a depth first search for word [str] 
+    in board [b], starting from node [node]. Returns true if [str] was found
+    looking horizontally, vertically, and diagonally searching from the starting
+    point, and returns false if not. *)
+let rec process_node (node:node) (index:int) (board:t) (str:string) 
+    (visited_pos:int list) : bool = 
+  let new_visited_pos = (node.position::visited_pos) in 
+  if index = String.length str - 1 then true else begin
+    let next_letter = str.[index + 1] in
+    let neighbor_positions = positions_of_neighbors node board in 
+    let possible_neighbors = List.filter 
+        (fun x -> (get_node x board).letter = next_letter) neighbor_positions
+    in
+    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
+      | [] -> acc
+      | h::t -> begin
+          if (List.mem h new_visited_pos = false) then begin
+            process_neighbors t (process_node (get_node h board) 
+                                   (index + 1) board str new_visited_pos)
+          end else process_neighbors t acc
+        end in 
+    (process_neighbors possible_neighbors true)
+  end
+
 (** [is_valid_word w b] returns true if [w] is contained in the english
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
@@ -214,6 +175,7 @@ let is_valid_word (word:string) (board:t) : bool =
       | h :: t -> node_loop t (acc || process_node h 0 board word []) in
     (node_loop nodes_fst_letter false)
   end else false
+
 
 let word_score (word:string) (board:t) : int =
   String.length word 
