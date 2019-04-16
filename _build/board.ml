@@ -1,3 +1,5 @@
+open Trie 
+
 type node = {
   letter : char;
   position : int;
