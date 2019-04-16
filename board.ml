@@ -138,28 +138,24 @@ let rec process_neighbors q (node:node) (board:t) (str:string) (words_acc:Trie.t
       let dummy = Queue.add neighbor q in 
       let dummy1 = visited.(pos) <- true in 
       let new_str = str ^ (Char.escaped neighbor.letter) in 
-      if Trie.contains english_words new_str then 
+      if 1 = 1 then 
+      (* if Trie.contains english_words new_str then  *)
       let words_acc = Trie.add_word words_acc new_str in 
+      (* process_neighbors q node board new_str words_acc visited t *)
       process_queue q node board new_str words_acc visited
-      else process_queue q node board new_str words_acc visited
+      else 
+      (* process_neighbors q node board new_str words_acc visited t  *)
+      process_queue q node board new_str words_acc visited
         end
     else process_neighbors q node board str words_acc visited t 
   end 
 
 and process_queue q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited : Trie.t = 
-  let new_str = str ^ (Char.escaped node.letter) in 
-  if Trie.contains english_words new_str then 
-    let words_acc = Trie.add_word words_acc str in 
     if Queue.is_empty q then words_acc else
     let u = Queue.take q in 
     let neighbor_positions = positions_of_neighbors u board in 
     process_neighbors q node board str words_acc visited neighbor_positions
-  else 
-  if Queue.is_empty q then words_acc else
-    let u = Queue.take q in 
-    let neighbor_positions = positions_of_neighbors u board in 
-    process_neighbors q node board str words_acc visited neighbor_positions
-
+ 
 (* returns a list of valid english words starting with the character in the node parameter *)
 let rec process_node (node:node) (board:t) (str:string) (words_acc:Trie.t): Trie.t = 
   let visited = Array.make (List.length board.nodes) false in 
