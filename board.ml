@@ -131,7 +131,7 @@ let is_valid_neighbor (node:node) (letter:char) (board:t) : bool =
 
 let rec process_neighbors q (node:node) (board:t) (str:string) (words_acc:Trie.t) visited (neighbors_lst:int list) : Trie.t = 
   match neighbors_lst with 
-  | [] -> words_acc
+  | [] -> process_queue q node board str words_acc visited
   | pos::t -> begin
     if visited.(pos) = false then begin 
       let neighbor = get_node pos board in 
