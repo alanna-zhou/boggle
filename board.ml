@@ -153,7 +153,7 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
     let new_nodes = n_node::node_lst in 
     let new_str = str^Char.escaped n_node.letter in 
     let words_acc = Trie.add_word words_acc new_str in 
-    let dummy = Queue.add new_nodes q in 
+    let () = Queue.add new_nodes q in 
     process_neighbors q node_lst str board words_acc t
   end 
 
@@ -169,9 +169,11 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
 (* returns a list of valid english words starting with the character in the node parameter *)
 let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
   let q = Queue.create () in 
-  let dummy = List.map (fun x -> Queue.add x q) nodes in 
+  match List.map (fun x -> Queue.add x q) nodes with
+  | [] -> process_queue q board words_acc  
+  | h::t -> process_queue q board words_acc  
+
   (* let dummy = Queue.add nodes q in  *)
-  process_queue q board words_acc  
     
 (* helper function for [populate_board] to start the BFS algorithm on the ndoes of the board *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
