@@ -19,28 +19,7 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-<<<<<<< HEAD
-let node0 = {letter='B';position=0}
-let node1 = {letter='A';position=1}
-let node2 = {letter='D';position=2}
-let node3 = {letter='E';position=3}
-let node4 = {letter='E';position=4}
-let node5 = {letter='F';position=5}
-let node6 = {letter='G';position=6}
-let node7 = {letter='S';position=7}
-let node8 = {letter='E';position=8}
-
-let b = {nodes=[node0;node1;node2;node3];words=Trie.empty}
-
-let testing = {nodes=[node0;node1;node2;node3;node4;node5;node6;node7;node8];words=Trie.empty}
-
-(*let english_words = add_words_from_file "english.txt"*)
-
-let dummy_trie = Trie.empty
-let english_words = Trie.add_words dummy_trie ["BAD";"BADE";"BA";"BEG";"BEE";"SEE";"FEED"]
-=======
 let english_words = add_words_from_file "english.txt"
->>>>>>> da25eda5e99bab69cca5e3d60b74e74d8b41fa2b
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
