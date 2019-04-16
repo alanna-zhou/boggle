@@ -28,7 +28,6 @@ let node6 = {letter='G';position=6}
 let node7 = {letter='S';position=7}
 let node8 = {letter='E';position=8}
 
-
 let b = {nodes=[node0;node1;node2;node3];words=Trie.empty}
 
 let testing = {nodes=[node0;node1;node2;node3;node4;node5;node6;node7;node8];words=Trie.empty}
