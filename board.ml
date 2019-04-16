@@ -138,11 +138,11 @@ let rec get_node_letter letter board_nodes acc =
   | h::t -> if (h.letter = letter) then (get_node_letter letter t (h::acc)) 
     else (get_node_letter letter t acc)
 
-(** [process_node node idx b str] does a depth first search for word [str] 
+(** [validate_node node idx b str] does a depth first search for word [str] 
     in board [b], starting from node [node]. Returns true if [str] was found
     looking horizontally, vertically, and diagonally searching from the starting
     point, and returns false if not. *)
-let rec process_node (node:node) (index:int) (board:t) (str:string) 
+let rec validate_node (node:node) (index:int) (board:t) (str:string) 
     (visited_pos:int list) : bool = 
   let new_visited_pos = (node.position::visited_pos) in 
   if index = String.length str - 1 then true else begin
@@ -155,7 +155,7 @@ let rec process_node (node:node) (index:int) (board:t) (str:string)
       | [] -> acc
       | h::t -> begin
           if (List.mem h new_visited_pos = false) then begin
-            process_neighbors t (process_node (get_node h board) 
+            process_neighbors t (validate_node (get_node h board) 
                                    (index + 1) board str new_visited_pos)
           end else process_neighbors t acc
         end in 
@@ -172,7 +172,7 @@ let is_valid_word (word:string) (board:t) : bool =
     let rec node_loop lst acc = 
       match lst with
       | [] -> acc
-      | h :: t -> node_loop t (acc || process_node h 0 board word []) in
+      | h :: t -> node_loop t (acc || validate_node h 0 board word []) in
     (node_loop nodes_fst_letter false)
   end else false
 
