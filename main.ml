@@ -14,8 +14,10 @@ let rec start_game () =
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard and r for Random. : "; 
   match  read_line () with
-  |"s" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Standard (4)))) []
-  |"r" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Random(4)))) []
+  |"s" -> playing_game (Unix.time() +. 90.) 
+            (State.init (Board.generate (Standard (4)))) []
+  |"r" -> playing_game (Unix.time() +. 90.) 
+            (State.init (Board.generate (Random(4)))) []
   |_-> print_endline "\nInvalid entry"; start_game ()
 and playing_game time st found_wrds =
   if is_game_over time
@@ -23,8 +25,10 @@ and playing_game time st found_wrds =
     end_game  st
   else  
     try 
+      print_string "\n"; 
       Board.format (State.board st) (Board.size (State.board st));
-      print_string ("\nWords found: " ^ (make_list found_wrds "") ^ "\nEnter a word: ");
+      print_string ("\nWords found: " ^ 
+                    (make_list found_wrds "") ^ "\nEnter a word: ");
       match Command.parse(read_line ()) with
       |Quit -> end_game st
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
@@ -32,7 +36,7 @@ and playing_game time st found_wrds =
       |Help -> print_string "\nTo enter a word, enter that word.
 To see your current score, enter #score.
 To quit/restart game, enter #quit.
-To see instructions, enter #help.\n";
+To see instructions, enter #help.";
         playing_game time st found_wrds
       |Entry (guess) -> 
         if is_game_over time then end_game st 
