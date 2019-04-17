@@ -14,11 +14,12 @@ let rec start_game () =
   print_endline "\n What kind of board would you like?";
   print_string  "\n Type s for Standard and r for Random. :> "; 
   match  read_line () with
-  |"s" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Standard (4)))) []
+  |"s" -> playing_game (Unix.time() +. 90.) (State.init (let () = Random.self_init() in Board.generate (Standard (4)))) []
   |"r" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Random(4)))) []
   |_-> print_endline "\n Invalid entry"; start_game ()
 
 and playing_game time st found_wrds =
+  let () = Random.self_init () in 
   if is_game_over time
   then 
     end_game  st
