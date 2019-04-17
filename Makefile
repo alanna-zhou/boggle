@@ -1,4 +1,4 @@
-MODULES=board state main authors command trie 
+MODULES=state main authors command trie board
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

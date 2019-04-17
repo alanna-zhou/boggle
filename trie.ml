@@ -37,7 +37,7 @@ let rec add_words trie words =
   | x::xs -> add_words (add_word trie x) xs
 
 let add_words_from_file (filename:string) : t =
-  failwith "unimplemented"
+  empty
 
 let rec contains_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
@@ -88,7 +88,6 @@ let contains_prefix trie pref =
   match trie with
   | Head (children) -> check_pref children pref
   | _ -> contains_help trie pref
-  
   
 let to_list (trie:t) : string list =
   failwith "unimplemented"

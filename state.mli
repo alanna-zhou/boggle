@@ -9,4 +9,6 @@ val board : t -> Board.t
 
 val score : t -> int 
 
+val words : t -> string list
+
 val update : t -> string -> t
