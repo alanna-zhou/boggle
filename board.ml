@@ -87,7 +87,7 @@ let generate_standard_4 =
   in create_board 15 {nodes=[];words=Trie.empty}
 
 (** [positions of neighbors node b] returns the list of positions of 
-   neighboring elements on the board. *)
+    neighboring elements on the board. *)
 let positions_of_neighbors (node:node) (board:t) : int list =
   let size = int_of_float 
       (Pervasives.sqrt ((float_of_int ((List.length board.nodes)+1)))) in 
@@ -213,15 +213,15 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     let neighbor_positions = positions_of_neighbors node board in 
     let possible_neighbors = List.filter 
         (fun x -> (get_node x board).letter = next_letter) neighbor_positions in
-    let rec process_neighbors neighbor_lst acc = match neighbor_lst with
+    let rec process_nlist neighbor_lst acc = match neighbor_lst with
       | [] -> acc
       | h::t -> begin
           if (List.mem h new_visited_pos = false) then begin
-            process_neighbors t (validate_node (get_node h board) 
-                                   (index + 1) board str new_visited_pos)
-          end else process_neighbors t acc
+            process_nlist t (validate_node (get_node h board) 
+                               (index + 1) board str new_visited_pos)
+          end else process_nlist t acc
         end in 
-    (process_neighbors possible_neighbors true)
+    (process_nlist possible_neighbors true)
   end
 
 (** [is_valid_word w b] returns true if [w] is contained in the english
