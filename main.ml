@@ -29,7 +29,10 @@ and playing_game time st found_wrds =
       |Quit -> end_game st
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
         playing_game time st found_wrds
-      |Help -> print_string "\nTo enter a word, enter that word.\nTo see your current score, enter #score.\nTo quit/restart game, enter #quit.\nTo see instructions, enter #help.";
+      |Help -> print_string "\nTo enter a word, enter that word.
+To see your current score, enter #score.
+To quit/restart game, enter #quit.
+To see instructions, enter #help.\n";
         playing_game time st found_wrds
       |Entry (guess) -> 
         if is_game_over time then end_game st 
