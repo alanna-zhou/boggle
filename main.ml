@@ -45,8 +45,6 @@ let rec playing_game time st found_wrds =
       playing_game time st found_wrds
 
 and  start_game () =
-  print_endline "What size board would you like to play with?";
-  print_string  "Side length> "; 
   try
     print_endline "What kind of board would you like?";
     print_string  "Type s for Standard and r for Random> "; 
