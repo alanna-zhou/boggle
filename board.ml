@@ -150,31 +150,31 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
   match neighbor_nodes with 
   | [] -> process_queue q board words_acc 
   | n_node::t -> begin 
-    let new_nodes = n_node::node_lst in 
-    let new_str = str^Char.escaped n_node.letter in 
-    if Trie.contains_prefix english_words new_str = false then 
-    process_queue q board words_acc else 
-    let words_acc = Trie.add_word words_acc new_str in 
-    let () = Queue.add new_nodes q in 
-    process_neighbors q node_lst str board words_acc t
-  end 
+      let new_nodes = n_node::node_lst in 
+      let new_str = str^Char.escaped n_node.letter in 
+      if Trie.contains_prefix english_words new_str = false then 
+        process_queue q board words_acc else 
+        let words_acc = Trie.add_word words_acc new_str in 
+        let () = Queue.add new_nodes q in 
+        process_neighbors q node_lst str board words_acc t
+    end 
 
 (* processes the entire queue holding all of the possible node sequences; essentially a loop for while the queue isn't empty *)
 and process_queue q (board:t) (words_acc:Trie.t) : Trie.t = 
-    if Queue.is_empty q then words_acc else
+  if Queue.is_empty q then words_acc else
     let node_lst = Queue.take q in 
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
     let words_acc = Trie.add_word words_acc new_str in 
     process_neighbors q node_lst new_str board words_acc neighbor_nodes
- 
+
 (* returns a list of valid english words starting with the character in the node parameter *)
 let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
   let q = Queue.create () in 
   match List.map (fun x -> Queue.add x q) nodes with
   | [] -> process_queue q board words_acc  
   | h::t -> process_queue q board words_acc  
-    
+
 (* helper function for [populate_board] to start the BFS algorithm on the ndoes of the board. since [process_node] takes in a list of nodes as each vertex for its BFS traversal, this function accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 

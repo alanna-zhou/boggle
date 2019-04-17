@@ -23,7 +23,8 @@ and playing_game time st found_wrds =
   then 
     end_game  st
   else  
-    try Board.format (State.board st) (Board.size (State.board st));
+    try print_string "\n"; 
+      Board.format (State.board st) (Board.size (State.board st));
       print_string ("\n Words found: " ^ (make_list found_wrds "") ^ "\n Enter a word:>");
       match Command.parse(read_line ()) with
       |Quit -> playing_game (Unix.time ()) st found_wrds
@@ -41,11 +42,11 @@ and playing_game time st found_wrds =
         then raise (Failure guess)
         else playing_game time (State.update st guess) (guess :: found_wrds)
     with 
-    |Failure x -> print_endline (x ^ "is not a valid input."); 
+    |Failure x -> print_endline (x ^ " is not a valid input."); 
       playing_game time st found_wrds
     |Empty -> print_string "\n Entry is empty, choose another word.";
       playing_game time st found_wrds
-      
+
 and end_game st =
   print_string("\n Game Over \n Your score: " ^ (string_of_int (State.score st))); 
   prompt_end ()
