@@ -256,5 +256,25 @@ let rec format board size =
       (format {board with nodes=t} size)
     end 
 
+let testing_board1 () = 
+  let node_list = [{letter='I'; position=0}; 
+                   {letter='F'; position=1}; 
+                   {letter='D'; position=2}; 
+                   {letter='D'; position=3}; 
+                   {letter='M'; position=4}; 
+                   {letter='S'; position=5}; 
+                   {letter='A'; position=6}; 
+                   {letter='Y'; position=7}; 
+                   {letter='Q'; position=8}; 
+                   {letter='P'; position=9}; 
+                   {letter='T'; position=10}; 
+                   {letter='R'; position=11}; 
+                   {letter='N'; position=12}; 
+                   {letter='A'; position=13};
+                   {letter='I'; position=14}; 
+                   {letter='C'; position=15};] in
+  {nodes=node_list; words=Trie.empty}  
+
+
 
 

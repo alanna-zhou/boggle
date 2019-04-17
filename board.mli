@@ -75,6 +75,9 @@ val get_possible_words: t -> string list
      Raises: No Exceptions*)
 val format : t -> size -> unit 
 
+val testing_board1: unit -> t
+
+
 
 
 

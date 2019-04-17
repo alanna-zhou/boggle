@@ -21,9 +21,7 @@ let words (state:t) : string list =
   Trie.to_list state.words
 
 let update (state:t) (word:string) : t =
-  if Board.is_valid_word word state.board then 
-    let new_words = Trie.add_word state.words word in 
-    let word_score = Board.word_score word state.board in 
-    let new_score = state.score + word_score in 
-    {board=state.board;score=new_score;words=new_words}
-  else state
+  let new_words = Trie.add_word state.words word in 
+  let word_score = Board.word_score word state.board in 
+  let new_score = state.score + word_score in 
+  {board=state.board;score=new_score;words=new_words}
