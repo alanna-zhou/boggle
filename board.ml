@@ -58,8 +58,8 @@ let size board =
 let generate_random (size:int) = 
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
-      let zero_or_one = Random.int 2 in 
-      if zero_or_one = 0 then begin
+      let vowels_or_consonants = Random.int 3 in 
+      if vowels_or_consonants = 0 then begin
         let letter = Array.get consonants (Random.int (Array.length consonants)) 
         in 
         let node = create_node letter index in 
