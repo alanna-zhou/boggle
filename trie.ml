@@ -101,16 +101,19 @@ let contains_prefix trie pref =
 
 let rec to_list_help trie acc curword =
   match trie with
-  | Node (c, children, is_word) -> let curword = curword ^ c in 
-    if is_word then
-      children_to_list children (curword::acc) curword else
-      children_to_list children acc curword
+  | Node (c, children, is_word) -> (* let curword = curword ^ c in *)
+  if is_word then children_to_list children (curword::acc) curword else
+  children_to_list children acc curword
   | Leaf -> acc
-  | _ -> failwith "invalid"
+  | _ -> failwith "Invalid Trie"
 and children_to_list children acc curword =
   match children with
-  | x::xs -> children_to_list xs (to_list_help x acc curword) curword
+  | (Node (c, childs, is_word))::xs -> let newword = curword ^ c in 
+  let acc = to_list_help (Node (c, childs, is_word)) acc newword in 
+  children_to_list xs acc curword
+  | [Leaf]
   | [] -> acc
+  | _ -> failwith "Invalid Trie"
 
 let to_list (trie:t) : string list =
   match trie with
