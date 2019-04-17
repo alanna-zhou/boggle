@@ -19,7 +19,7 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = add_words_from_file "words.txt"
+let english_words = add_words_from_file "google_english.txt"
 
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
