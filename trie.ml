@@ -36,8 +36,21 @@ let rec add_words trie words =
   | [] -> trie
   | x::xs -> add_words (add_word trie x) xs
 
+let rec read_words trie channel =
+  let to_add = try input_line channel with
+  | End_of_file -> "\n"
+  in
+  if to_add = "\n" then trie else
+  let trie = add_word trie to_add in
+  read_words trie channel;;
+
 let add_words_from_file (filename:string) : t =
+<<<<<<< HEAD
+  read_words empty (open_in filename);;
+
+=======
   empty
+>>>>>>> f6bbd245c95e202a5b1b74cc1ab8a4b98f6b2455
 
 let rec contains_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
@@ -89,5 +102,20 @@ let contains_prefix trie pref =
   | Head (children) -> check_pref children pref
   | _ -> contains_help trie pref
   
+let rec to_list_help trie acc curword =
+  match trie with
+  | Node (c, children, is_word) -> let curword = curword ^ c in 
+  if is_word then
+  children_to_list children (curword::acc) curword else
+  children_to_list children acc curword
+  | Leaf -> acc
+  | _ -> failwith "invalid"
+and children_to_list children acc curword =
+  match children with
+  | x::xs -> children_to_list xs (to_list_help x acc curword) curword
+  | [] -> acc
+  
 let to_list (trie:t) : string list =
-  failwith "unimplemented"
+  match trie with
+  | Head (children) -> children_to_list children [] ""
+  | _ -> failwith "Invalid Trie"
