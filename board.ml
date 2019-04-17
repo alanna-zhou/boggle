@@ -19,7 +19,7 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = add_words_from_file "english.txt"
+let english_words = add_words_from_file "words.txt"
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -76,6 +76,7 @@ let generate_random (size:int) =
 (** [generate_standard_4] generates a 4x4 standard board using preconfigured 
     die.*)
 let generate_standard_4 =
+  let () = Random.self_init() in
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
       let die = Array.get standard_4 index in 
@@ -227,7 +228,7 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  if Trie.contains english_words word then begin 
+  if Trie.contains english_words (String.lowercase_ascii word) then begin 
     let first_char = word.[0] in 
     let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
     let rec node_loop lst acc = 
