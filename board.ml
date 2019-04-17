@@ -58,8 +58,8 @@ let size board =
 let generate_random (size:int) = 
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
-      let zero_or_one = Random.int 2 in 
-      if zero_or_one = 0 then begin
+      let vowels_or_consonants = Random.int 3 in 
+      if vowels_or_consonants = 0 then begin
         let letter = Array.get consonants (Random.int (Array.length consonants)) 
         in 
         let node = create_node letter index in 
@@ -152,6 +152,8 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
   | n_node::t -> begin 
     let new_nodes = n_node::node_lst in 
     let new_str = str^Char.escaped n_node.letter in 
+    if Trie.contains_prefix english_words new_str = false then 
+    process_queue q board words_acc else 
     let words_acc = Trie.add_word words_acc new_str in 
     let () = Queue.add new_nodes q in 
     process_neighbors q node_lst str board words_acc t

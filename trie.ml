@@ -45,8 +45,12 @@ let rec read_words trie channel =
   read_words trie channel;;
 
 let add_words_from_file (filename:string) : t =
+<<<<<<< HEAD
   read_words empty (open_in filename);;
 
+=======
+  empty
+>>>>>>> f6bbd245c95e202a5b1b74cc1ab8a4b98f6b2455
 
 let rec contains_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
