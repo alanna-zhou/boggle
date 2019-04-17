@@ -23,7 +23,8 @@ let rec playing_game time st found_wrds =
     |Failure x -> print_endline "This is not a valid input."; 
       (playing_game time st found_wrds)
   else  
-    try print_string ("Words found: \n" ^ (make_list found_wrds "")^ "\n Enter a word");
+    try Board.format (State.board st) (Board.size (State.board st));
+      print_string ("Words found: " ^ (make_list found_wrds "") ^ "\n Enter a word:>");
       match Command.parse(read_line ()) with
       |Quit -> playing_game (Unix.time ()) st found_wrds
       |Score -> print_string ("Your score: " ^ string_of_int (State.score st));
