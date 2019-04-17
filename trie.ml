@@ -8,9 +8,9 @@ let rec add_word_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in
     match trie with
     | Node (c, children, _) -> Node (c, update_children children tail,
-    String.length tail = 1)
+    String.length word = 1)
     | Leaf -> Node (curchar, update_children [Leaf] tail,
-    String.length tail = 1)
+    String.length word = 1)
     | _ -> failwith "Function does not accept Head as input"
 and update_children children word =
   if word = "" then children else
@@ -18,11 +18,11 @@ and update_children children word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
     match children with
     | (Node (c, childs, _))::xs -> if c = curchar then
-    (add_word_help (Node (c, childs, String.length tail = 1)) word)::xs else
-    (Node (c, childs, String.length tail = 1))::(update_children xs word)
+    (add_word_help (Node (c, childs, String.length word = 1)) word)::xs else
+    (Node (c, childs, String.length word = 1))::(update_children xs word)
     | [Leaf]
     | [] -> [(Node (curchar, update_children [Leaf] tail, 
-    String.length tail = 1))]
+    String.length word = 1))]
     | _ -> failwith "Function does not accept Head as input"
 
 let add_word trie word = 
@@ -45,17 +45,13 @@ let rec read_words trie channel =
   read_words trie channel;;
 
 let add_words_from_file (filename:string) : t =
-<<<<<<< HEAD
   read_words empty (open_in filename);;
 
-=======
-  empty
->>>>>>> f6bbd245c95e202a5b1b74cc1ab8a4b98f6b2455
 
 let rec contains_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
   match trie with
-  | Node (c, children, is_word) -> if String.length tail = 1 then
+  | Node (c, children, is_word) -> if String.length tail < 1 then
   is_word && check_char children tail else
   check_char children tail
   | Leaf -> false
@@ -65,7 +61,8 @@ and check_char children word =
   let curchar = String.sub word 0 1 in 
   match children with
   | (Node (c, childs, is_word))::xs ->
-  if c = curchar then contains_help (Node (c, childs, is_word)) word
+  if c = curchar then 
+  contains_help (Node (c, childs, is_word)) word
   else check_char xs word
   | [Leaf]
   | [] -> false
@@ -80,9 +77,7 @@ let word = String.lowercase_ascii word in
 let rec contains_prefix_help trie pref =
   let tail = String.sub pref 1 ((String.length pref) - 1) in 
   match trie with
-  | Node (c, children, _) -> if String.length tail = 1 then
-  check_pref children tail else
-  check_pref children tail
+  | Node (c, children, is_word) -> check_pref children tail
   | Leaf -> false
   | Head (_) -> failwith "Function does not accept Head as input"
 and check_pref children pref =
@@ -90,8 +85,9 @@ and check_pref children pref =
   let curchar = String.sub pref 0 1 in 
   match children with
   | (Node (c, childs, is_word))::xs ->
-  if c = curchar then contains_help (Node (c, childs, is_word)) pref
-  else check_char xs pref
+  if c = curchar then 
+  contains_prefix_help (Node (c, childs, is_word)) pref
+  else check_pref xs pref
   | [Leaf]
   | [] -> false
   | _ -> failwith "Trie invalid"
