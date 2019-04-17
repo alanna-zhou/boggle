@@ -19,7 +19,10 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = add_words_from_file "words.txt"
+let english_words = add_words_from_file "google_english.txt"
+
+let exp = Trie.contains english_words "I"
+let () = if exp = true then print_string "t" else print_string "f"
 
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
@@ -231,16 +234,16 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  if Trie.contains english_words (String.lowercase_ascii word) then begin 
-    let upper_word = String.uppercase_ascii word in
-    let first_char = upper_word.[0] in 
-    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
-    let rec node_loop lst acc = 
-      match lst with
-      | [] -> acc
-      | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
-    (node_loop nodes_fst_letter false)
-  end else false
+  (*if Trie.contains english_words (String.lowercase_ascii word) then begin *)
+  let upper_word = String.uppercase_ascii word in
+  let first_char = upper_word.[0] in 
+  let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+  let rec node_loop lst acc = 
+    match lst with
+    | [] -> acc
+    | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
+  (node_loop nodes_fst_letter false)
+(*end else false*)
 
 (** [word_score] computes the score of a word in the context of a board. *)
 let word_score (word:string) (board:t) : int =

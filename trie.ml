@@ -7,8 +7,8 @@ let rec add_word_help trie word =
   let curchar = String.sub word 0 1 in 
   let tail = String.sub word 1 ((String.length word) - 1) in
     match trie with
-    | Node (c, children, _) -> Node (c, update_children children tail,
-    String.length word = 1)
+    | Node (c, children, is_word) -> Node (c, update_children children tail,
+    String.length word = 1 || is_word)
     | Leaf -> Node (curchar, update_children [Leaf] tail,
     String.length word = 1)
     | _ -> failwith "Function does not accept Head as input"
@@ -17,9 +17,10 @@ and update_children children word =
     let curchar = String.sub word 0 1 in 
     let tail = String.sub word 1 ((String.length word) - 1) in 
     match children with
-    | (Node (c, childs, _))::xs -> if c = curchar then
+    | (Node (c, childs, is_word))::xs -> if c = curchar then
     (add_word_help (Node (c, childs, String.length word = 1)) word)::xs else
-    (Node (c, childs, String.length word = 1))::(update_children xs word)
+    (Node (c, childs, String.length word = 1 || is_word))
+    ::(update_children xs word)
     | [Leaf]
     | [] -> [(Node (curchar, update_children [Leaf] tail, 
     String.length word = 1))]

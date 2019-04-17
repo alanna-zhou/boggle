@@ -5,6 +5,9 @@ open State
 let board = testing_board1 ()
 let () = format board 4
 
+let exp = is_valid_word "i" board
+let () = if exp = true then print_string "t" else print_string "f"
+
 let state_0 = init board
 let state_1 = update state_0 "i"
 let state_2 = update state_1 "tip"
