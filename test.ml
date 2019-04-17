@@ -3,6 +3,7 @@ open Board
 open State
 
 let board = testing_board1 ()
+let () = format board 4
 
 let state_0 = init board
 let state_1 = update state_0 "i"
@@ -37,12 +38,14 @@ let board_tests = [
                                 (is_valid_word "i" board));
   "is_valid_word test6" >:: (fun _ -> assert_equal true 
                                 (is_valid_word "it" board));
-  "is_valid_word test7" >:: (fun _ -> assert_equal true 
-                                (is_valid_word "first" board));
+  "is_valid_word test7" >:: (fun _ -> assert_equal false
+                                (is_valid_word "yard" board));
   "is_valid_word test8" >:: (fun _ -> assert_equal false 
                                 (is_valid_word "jfkdsjflkjsd" board));
   "is_valid_word test9" >:: (fun _ -> assert_equal false
                                 (is_valid_word "yam" board));
+  "is_valid_word test10" >:: (fun _ -> assert_equal false
+                                 (is_valid_word "tipd" board));
 
   (**Checking word scores*)
   "score test1" >:: (fun _ -> assert_equal 3
