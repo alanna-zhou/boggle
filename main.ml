@@ -23,7 +23,8 @@ and playing_game time st found_wrds =
   then 
     end_game  st
   else  
-    try Board.format (State.board st) (Board.size (State.board st));
+    try print_string "\n"; 
+      Board.format (State.board st) (Board.size (State.board st));
       print_string ("\n Words found: " ^ (make_list found_wrds "") ^ "\n Enter a word:>");
       match Command.parse(read_line ()) with
       |Quit -> end_game st

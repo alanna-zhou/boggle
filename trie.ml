@@ -14,8 +14,8 @@ let rec add_word_help trie word =
     | _ -> failwith "Function does not accept Head as input"
 and update_children children word =
   if word = "" then children else
-  let curchar = String.sub word 0 1 in 
-  let tail = String.sub word 1 ((String.length word) - 1) in 
+    let curchar = String.sub word 0 1 in 
+    let tail = String.sub word 1 ((String.length word) - 1) in 
     match children with
     | (Node (c, childs, _))::xs -> if c = curchar then
     (add_word_help (Node (c, childs, String.length word = 1)) word)::xs else
@@ -26,7 +26,7 @@ and update_children children word =
     | _ -> failwith "Function does not accept Head as input"
 
 let add_word trie word = 
-let word = String.lowercase_ascii word in
+  let word = String.lowercase_ascii word in
   match trie with
   | Head  (children) -> Head (update_children children word)
   | _ -> add_word_help trie word
@@ -38,11 +38,11 @@ let rec add_words trie words =
 
 let rec read_words trie channel =
   let to_add = try input_line channel with
-  | End_of_file -> "\n"
+    | End_of_file -> "\n"
   in
   if to_add = "\n" then trie else
-  let trie = add_word trie to_add in
-  read_words trie channel;;
+    let trie = add_word trie to_add in
+    read_words trie channel;;
 
 let add_words_from_file (filename:string) : t =
   read_words empty (open_in filename);;
@@ -69,7 +69,7 @@ and check_char children word =
   | _ -> failwith "Trie invalid"
 
 let contains (trie:t) (word:string) : bool =
-let word = String.lowercase_ascii word in 
+  let word = String.lowercase_ascii word in 
   match trie with
   | Head (children) -> check_char children word
   | _ -> contains_help trie word
@@ -97,20 +97,20 @@ let contains_prefix trie pref =
   match trie with
   | Head (children) -> check_pref children pref
   | _ -> contains_help trie pref
-  
+
 let rec to_list_help trie acc curword =
   match trie with
   | Node (c, children, is_word) -> let curword = curword ^ c in 
-  if is_word then
-  children_to_list children (curword::acc) curword else
-  children_to_list children acc curword
+    if is_word then
+      children_to_list children (curword::acc) curword else
+      children_to_list children acc curword
   | Leaf -> acc
   | _ -> failwith "invalid"
 and children_to_list children acc curword =
   match children with
   | x::xs -> children_to_list xs (to_list_help x acc curword) curword
   | [] -> acc
-  
+
 let to_list (trie:t) : string list =
   match trie with
   | Head (children) -> children_to_list children [] ""

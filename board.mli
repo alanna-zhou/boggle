@@ -24,18 +24,20 @@ type board_type = Standard of size | Random of size
 (** [generate size] generates a board of dimensions [size] x [size]. It uses
     the standard die to decide each letter on the board. 
     @param size is the size of the board you want to generate
-    @returns board is the board created
+    @return board is the board created
     Raises: InvalidSize if a board of the specified size cannot be generated.
     Requires: Standard board must be of size 4, random boards can be of any
-    size. *)
+    size. 
+    Example: [generate (Standard 4)]*)
 val generate : board_type -> t
 
 
 (** [size b] returns the height/width of the board. 
     @param b is a board.
-    @returns the size of the board. 
+    @return the size of the board. 
     Raises: Does not raise any exceptions.
-    Requires: The board must be square. *)
+    Requires: The board must be square.
+    Example: [size board = 4] *)
 val size: t -> int 
 
 (** [is_valid_word w b] check whether word [w] can be formed on board [b] 
@@ -44,24 +46,27 @@ val size: t -> int
     The word can appear backward on the board.
     @param w is the word that is being check as valid.
     @param b is the board in which the word is being found.
-    @returns is a bool true/false indicating whether the word was found.
-    Raises: Does not raise any exceptions*)
+    @return is a bool true/false indicating whether the word was found.
+    Raises: Does not raise any exceptions
+    Example: [is_valid_word "hello" b = true]*)
 val is_valid_word: string -> t -> bool
 
 (** [word_score w b] is the score of the word w in board b. The score is
     equivalent to the word length. 
     @param w is the word whose score is desired.
     @param b is the board in which you want to check its score.
-    @returns an integer denoting the score of the word.
+    @return an integer denoting the score of the word.
     Requires: word w must be a valid word in board b.
-    Raises: No Exceptions *)
+    Raises: No Exceptions 
+    Example: [word_score "hello" b = 5]*)
 val word_score: string -> t -> int
 
 (** [get_possible_words b] is a list of all the possible words that the board
     can form. 
     @param b is the board you want to form words from
-    @returns a string list containing all possible words
-    Raises: No Exceptions *)
+    @return a string list containing all possible words
+    Raises: No Exceptions
+    Example: [get_possible_words b = ["hello;"; "hi"; "nice"]] *)
 val get_possible_words: t -> string list
 
 (** [format b size] is a printing function suitable for use
@@ -70,10 +75,19 @@ val get_possible_words: t -> string list
      on the given formatter. 
      @param b is the board you want to print out
      @param size is the height/width of the board you want to print out.
-     @returns unit 
+     @return unit 
      Requires: Board b must be square.
-     Raises: No Exceptions*)
+     Raises: No Exceptions
+     Example: [format b 4] prints out the board to the console. *)
 val format : t -> size -> unit 
+
+(** [testing_board1 ()] returns a Standard board for testing purposes.
+    @param unit
+    @return board for testing
+    Raises: No Exceptions
+    Example: [testing_board1 ()] returns a board.*)
+val testing_board1: unit -> t
+
 
 
 
