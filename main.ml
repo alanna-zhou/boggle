@@ -45,15 +45,13 @@ let rec playing_game time st found_wrds =
       playing_game time st found_wrds
 
 and  start_game () =
-  try
-    print_endline "What kind of board would you like?";
-    print_string  "Type s for Standard and r for Random> "; 
-    match  read_line () with
-    |"s" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Standard (4)))) []
-    |"r" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Random(4)))) []
-    |_-> print_endline "Invalid entry"; start_game ()
-  with 
-  |Failure x-> print_endline "Invalid side length." ; start_game ()
+  print_endline "What kind of board would you like?";
+  print_string  "Type s for Standard and r for Random> "; 
+  match  read_line () with
+  |"s" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Standard (4)))) []
+  |"r" -> playing_game (Unix.time() +. 90.) (State.init (Board.generate (Random(4)))) []
+  |_-> print_endline "Invalid entry"; start_game ()
+
 
 
 
