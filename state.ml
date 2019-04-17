@@ -17,6 +17,9 @@ let score (state:t) : int =
 let board (state:t) : Board.t = 
   state.board
 
+let words (state:t) : string list =
+  Trie.to_list state.words
+
 let update (state:t) (word:string) : t =
   if Board.is_valid_word word state.board then 
     let new_words = Trie.add_word state.words word in 
