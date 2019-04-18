@@ -18,7 +18,7 @@ and update_children children word =
     let tail = String.sub word 1 ((String.length word) - 1) in 
     match children with
     | (Node (c, childs, is_word))::xs -> if c = curchar then
-    (add_word_help (Node (c, childs, String.length word = 1)) word)::xs else
+    (add_word_help (Node (c, childs, String.length word = 1 || is_word)) word)::xs else
     (Node (c, childs, String.length word = 1 || is_word))
     ::(update_children xs word)
     | [Leaf]

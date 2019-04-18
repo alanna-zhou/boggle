@@ -2,14 +2,18 @@ open Board
 open Command
 open State
 
+(** type to represent the game *)
 type game = {
   state : State.t;
 }
-let rec make_list lst acc=
+
+(** [make_list] returns a list as a string separated by semi-colons. *)
+let rec make_list lst acc =
   match lst with 
   |[]-> acc
   |h::t-> make_list t (h ^ "; " ^ acc)
 
+(** [start_game] starts the game and allows for user input.  *)
 let rec start_game () =
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard and r for Random. : "; 
@@ -50,10 +54,12 @@ To see instructions, enter #help.";
     |Empty -> print_string "\nEntry is empty, choose another word.";
       playing_game time st found_wrds
 
+(** [end_game] ends the game.  *)
 and end_game st =
   print_string("\nGame Over \nYour score: " ^ (string_of_int (State.score st))); 
   prompt_end ()
 
+(** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
 and prompt_end () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
@@ -63,13 +69,13 @@ and prompt_end () =
 and is_game_over time =
   Unix.time () >= time
 
-
+(** [main] initializes and executes the game.  *)
 let main () =
   print_string "Welcome to Word Blitz! At any time, type #help for the gameplay
    instructions. \n";
   start_game ()
 
-let () = main()
+let () = main ()
 
 
 
