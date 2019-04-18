@@ -11,6 +11,7 @@ exception InvalidSize of size
 type t = {
   nodes : node list;
   words : Trie.t;
+  (* for now, words is not implemented, we are going to implement it for the next sprint using a BFS (part of our excellent scope) *)
 }
 
 type board_type = Standard of size | Random of size 
@@ -125,70 +126,6 @@ let get_node (index:int) (board:t) : node =
 let letters_of_neighbors (pos_list:int list) (board:t) : char list =
   List.map (fun x -> let node = get_node x board in node.letter) pos_list
 
-(** [nodes_of_neighbors] gets the neighboring nodes given a node on the board. *)
-let nodes_of_neighbors (node:node) (board:t) : node list =
-  let neighbor_positions = positions_of_neighbors node board in 
-  let rec rec_nodes positions acc =
-    match positions with 
-    | [] -> acc 
-    | h::t -> rec_nodes t ((get_node h board)::acc)
-  in rec_nodes neighbor_positions []
-
-(** [get_string_from_nodes] when given a list of nodes, will return the string formed by the nodes (but in reverse order - the reason for this is to optimize accessing nodes from the front as prepending is faster than appending) *)
-let get_string_from_nodes (nodes:node list) : string = 
-  let char_array = List.map (fun x -> x.letter) nodes in 
-  let string_array = List.map (fun x -> Char.escaped x) char_array in 
-  List.fold_left (fun acc x -> x^acc) "" string_array
-
-(** [get_BFS_neighbors] returns a sequence of nodes; gets neighbors of last node in the sequence, and then subtracts from these neighbors any nodes that are already present in the sequence. This is used only for the BFS traversal; which is finding all the possible words on a board in [populate_board] *)
-let get_BFS_neighbors (nodes:node list) board : node list =
-  match nodes with
-  | [] -> []
-  | last_node::t -> let neighbor_nodes = nodes_of_neighbors last_node board in
-    List.filter (fun x -> not (List.mem x nodes)) neighbor_nodes 
-
-(** [process_neighbors] is used for the BFS traversal to find all the possible words on a board. This is only part of the algorithm; it only adds one letter to the node_lst, for example, if the queue passed in "ABC" then this would only process one valid neighboring character, like "ABCD," "ABCE", "ABCF" ... and so on. *)
-let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_acc:Trie.t) (neighbor_nodes:node list) : Trie.t = 
-  match neighbor_nodes with 
-  | [] -> process_queue q board words_acc 
-  | n_node::t -> begin 
-      let new_nodes = n_node::node_lst in 
-      let new_str = str^Char.escaped n_node.letter in 
-      if 1 =1 
-      (* if Trie.contains_prefix english_words new_str = false  *)
-      then process_queue q board words_acc 
-      else 
-        let words_acc = Trie.add_word words_acc new_str in 
-        let () = Queue.add new_nodes q in 
-        process_neighbors q node_lst str board words_acc t
-    end 
-
-(** [process_queue] is used for the BFS traversal to find all the possible words on a board. It processes the entire queue holding all of the possible node sequences; essentially a loop for while the queue isn't empty *)
-and process_queue q (board:t) (words_acc:Trie.t) : Trie.t = 
-  if Queue.is_empty q then words_acc else
-    let node_lst = Queue.take q in 
-    let neighbor_nodes = get_BFS_neighbors node_lst board in 
-    let new_str = get_string_from_nodes node_lst in 
-    let words_acc = Trie.add_word words_acc new_str in 
-    process_neighbors q node_lst new_str board words_acc neighbor_nodes
-
-(** [process_node] is used for the BFS traversal to find all the possible words on a board. It returns a list of valid english words starting with the character in the node parameter. *)
-let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
-  let q = Queue.create () in 
-  match List.map (fun x -> Queue.add x q) nodes with
-  | [] -> process_queue q board words_acc  
-  | h::t -> process_queue q board words_acc  
-
-(** [populate_board_words] is a helper function for [populate_board] to start the BFS algorithm on the ndoes of the board. Since [process_node] takes in a list of nodes as each vertex for its BFS traversal, this function accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
-let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
-  let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 
-  process_node nodes_for_q board Trie.empty
-
-(** [populate_board] actually populates the board with all the possible words that it can form from a BFS traversal. *)
-let rec populate_board (board:t) : t =
-  let trie = populate_board_words board.nodes board Trie.empty in 
-  {nodes=board.nodes;words=trie}
-
 (** [generate] creates a board given a board type.  *)
 let generate (board_type:board_type) : t = 
   match board_type with 
@@ -246,7 +183,7 @@ let is_valid_word (word:string) (board:t) : bool =
 let word_score (word:string) (board:t) : int =
   String.length word 
 
-(** [get_possible_words] gets all of the possible words of a board, which is contained in board.words (which we populate via the [populate_board] method)  *)
+(** [get_possible_words] gets all of the possible words of a board, which is contained in board.words (which we plan to populate via a future [populate_board] method)  *)
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
 
