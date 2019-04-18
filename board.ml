@@ -19,7 +19,7 @@ let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
-let english_words = add_words_from_file "google_english.txt"
+let english_words = add_words_from_file "usa.txt"
 
 let exp = Trie.contains english_words "I"
 let () = if exp = true then print_string "t" else print_string "f"
@@ -265,6 +265,7 @@ let rec format board size =
       (format {board with nodes=t} size)
     end 
 
+(** Used to help test *)
 let testing_board1 () = 
   let node_list = [{letter='I'; position=0}; 
                    {letter='F'; position=1}; 

@@ -1,9 +1,9 @@
 open OUnit2
 open Board
 open State
+open Trie
 
 let board = testing_board1 ()
-let () = format board 4
 
 let exp = is_valid_word "i" board
 let () = if exp = true then print_string "t" else print_string "f"
@@ -71,11 +71,18 @@ let state_tests = [
                         (cmp_set_like_lists ["i"; "tip"; "rat"] (words state_3))))
 ]
 
+let trie0 = Trie.empty
+let trie1 = Trie.add_words_from_file "words.txt"
+let trie2 = Trie.add_word (Trie.add_word Trie.empty "computer") "computers"
 let trie_tests = [
-  (**TODO: Add Trie tests here *)
+  "contains 'rat'" >:: (fun _ -> assert_equal true (contains trie1 "rat"));
+  "contains 'rats'" >:: (fun _ -> assert_equal true (contains trie1 "rats"));
+  "contains 'I'" >:: (fun _ -> assert_equal true (contains trie1 "I"));
+  "contains 'computer'" >:: (fun _ -> assert_equal true (contains trie2 "computer"));
+  "does not contain 'afdsasi'" >:: (fun _ -> assert_equal false (contains trie1 "afdsasi"));
+  "empty trie is empty" >:: (fun _ -> assert_equal false (contains trie0 "anything"));
+  "to_list test" >:: (fun _ -> assert_equal true (cmp_set_like_lists ["computer"; "computers"] (to_list trie2)))
 ]
-
-
 
 let suite = "test suite for A6" >::: List.flatten [
     board_tests; 
