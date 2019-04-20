@@ -157,12 +157,14 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
   | n_node::t -> begin 
       let new_nodes = n_node::node_lst in 
       let new_str = str^Char.escaped n_node.letter in 
-      if 1 =1 
-      (* if Trie.contains_prefix english_words new_str = false  *)
+      if Trie.contains_prefix english_words new_str = false 
       then process_queue q board words_acc 
       else 
+        if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
+        process_neighbors q node_lst str board words_acc t
+        else let () = Queue.add new_nodes q in 
         process_neighbors q node_lst str board words_acc t
     end 
 
@@ -172,8 +174,11 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
     let node_lst = Queue.take q in 
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
+    if Trie.contains english_words new_str = true then 
     let words_acc = Trie.add_word words_acc new_str in 
     process_neighbors q node_lst new_str board words_acc neighbor_nodes
+    else process_neighbors q node_lst new_str board words_acc neighbor_nodes
+
 
 (** [process_node] is used for the BFS traversal to find all the possible words on a board. It returns a list of valid english words starting with the character in the node parameter. *)
 let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
