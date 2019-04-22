@@ -37,6 +37,13 @@ val score : t -> int
   Example: Given a state keeping track of a 2 x 2 board of A B C D, a score of 10, and a word list of ["ABC";"AB"], [words] should return ["ABC";"AB"]. The internal representation of the word list depends on Board's implementation, but this will always return a string list. *)
 val words : t -> string list
 
+(** [hint] is [t] after a hint has been requested by the user, points are
+  reduced by 5 and hints_left is reduced by 1.
+  @param state of type t
+  @return updated state of type t
+  Requires: state.hints_left > 0
+  Raises: None*)
+val hint : t -> t
 
 (** [update] allows the state to be updated when a new word has been entered by a player.
   @param old_state of type t
