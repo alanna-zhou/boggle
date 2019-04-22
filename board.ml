@@ -21,6 +21,15 @@ let vowels = [|'A';'E';'I';'O';'U'|]
 
 let english_words = add_words_from_file "usa.txt"
 
+let scrabble_points = [(1, ['A';'E';'I';'O';'U';'L';'N';'S';'T';'R']); (2, ['D';'G']); (3, ['B';'C';'M';'P']); (4, ['F';'H';'V';'W';'Y']); (5, ['K']); (8, ['J';'K']); (10, ['Q';'Z']) ]
+
+let get_letter_score (c:char) : int = 
+  let rec helper lst = 
+    match lst with 
+    | [] -> 0
+    | (score, [])::t -> helper t 
+    | (score, letters)::t -> if List.mem (Char.uppercase_ascii c) letters then score else helper t 
+  in helper scrabble_points
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -41,6 +50,8 @@ let die_15 = [|'P';'A';'C';'E';'M';'D'|]
 
 let standard_4 = [|die_0;die_1;die_2;die_3;die_4;die_5;die_6;die_7;die_8;
                    die_9;die_10;die_11;die_12;die_13;die_14;die_15;|]
+
+
 
 (** [create_node l p] creates a node, to be placed in a board, with
     the field letter set as l and position set as p. *)
@@ -247,9 +258,16 @@ let is_valid_word (word:string) (board:t) : bool =
     (node_loop nodes_fst_letter false)
   end else false
 
+let string_to_chars (word:string) : char list = 
+  let rec helper index acc = 
+    if index < 0 then acc
+    else helper (index-1) (word.[index]::acc) in 
+  helper (String.length word - 1) []
+
 (** [word_score] computes the score of a word in the context of a board. *)
 let word_score (word:string) (board:t) : int =
-  String.length word 
+  let char_lst = string_to_chars word in 
+  List.fold_left (fun acc c -> get_letter_score c + acc) 0 char_lst
 
 (** [get_possible_words] gets all of the possible words of a board, which is contained in board.words (which we populate via the [populate_board] method)  *)
 let get_possible_words (board:t) : string list = 
