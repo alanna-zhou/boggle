@@ -6,24 +6,28 @@ type node = {
 }
 type size = int
 
+type filename = string 
+
 exception InvalidSize of size 
+
+exception InvalidFile of filename
 
 type t = {
   nodes : node list;
   words : Trie.t;
 }
 
-type board_type = Standard of size | Random of size 
+type board_type = 
+  | Standard of size 
+  | Random of size 
+  | Custom_die of (string * size) 
+  | Custom_board of (string * size)
 
 let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
 let english_words = add_words_from_file "usa.txt"
-
-let exp = Trie.contains english_words "I"
-let () = if exp = true then print_string "t" else print_string "f"
-
 
 let die_0 = [|'R';'I';'F';'O';'B';'X'|]
 let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
@@ -42,15 +46,37 @@ let die_13 = [|'R';'A';'L';'E';'S';'C'|]
 let die_14 = [|'U';'W';'I';'L';'R';'G'|]
 let die_15 = [|'P';'A';'C';'E';'M';'D'|]
 
-let standard_4 = [|die_0;die_1;die_2;die_3;die_4;die_5;die_6;die_7;die_8;
-                   die_9;die_10;die_11;die_12;die_13;die_14;die_15;|]
+
+(** [create_die_arr f s] creates an array of character arrays of die as listed
+    in filename [f] of length [s]*[s]. This array contains the 6 sided 
+    configurations of all die for the [s]*[s] board as specified by file [f],
+    where [f] is a .txt file formatted as specified in the instrunctions. *)
+let create_die_arr (filename:string) (board_dim:int) : (char array) array = 
+  if Filename.check_suffix filename ".txt" then begin 
+    let open_file = (try (open_in filename) with
+        | Sys_error f -> raise (InvalidFile f)) in 
+    let rec read_loop chan file (acc: (char array) list) (acc2: char list) = 
+      match (input_char chan) with 
+      |exception End_of_file -> begin
+          if (List.length acc = ((board_dim * board_dim) - 1)) then 
+            (Array.of_list (List.rev acc2)::acc)
+          else let () = print_int 0 in raise (InvalidSize board_dim)
+        end
+      | '\n' -> if List.length acc2 = 6 then begin 
+          read_loop chan file (Array.of_list (List.rev acc2)::acc) []
+        end else raise (InvalidFile(filename))
+      | l  -> read_loop chan file acc (l::acc2)  in 
+    Array.of_list (List.rev (read_loop open_file filename [] []))
+  end else raise (InvalidFile(filename))
 
 (** [create_node l p] creates a node, to be placed in a board, with
-    the field letter set as l and position set as p. *)
-let create_node (letter:char) (position:int) : node = 
+    the field letter set as l, position set as p, and points set to
+    a randomnly generated number from 1-5. *)
+let create_node (letter:char) (position:int) : node =
   {letter= letter; position=position}
 
-(** [random_char] generates a random character from the English alphabet. A 4x4 standard die has bound of 6. *)
+(** [random_char] generates a random character from the English alphabet. 
+    A 4x4 standard die has bound of 6. *)
 let random_char die_arr (bound:int) =
   let random_int = Random.int bound in 
   Array.get die_arr random_int
@@ -77,18 +103,38 @@ let generate_random (size:int) =
     end
   in create_board ((size*size)-1) {nodes=[];words=Trie.empty}
 
-(** [generate_standard_4] generates a 4x4 standard board using preconfigured 
-    die.*)
-let generate_standard_4 =
+(** [generate_standard arr s] generates a [s]*[s] standard board using 
+    preconfigured die in arr.*)
+let generate_standard die_arr size =
   let () = Random.self_init() in
   let rec create_board (index:int) (board:t) = 
     if index < 0 then board else begin
-      let die = Array.get standard_4 index in 
+      let die = Array.get die_arr index in 
       let letter = random_char die 6 in 
       let node = create_node letter index in 
       create_board (index-1) {nodes=(node::board.nodes);words=board.words}
     end 
-  in create_board 15 {nodes=[];words=Trie.empty}
+  in create_board (size*size - 1) {nodes=[];words=Trie.empty}
+
+(** [generate_custom f s] generates a [s]*[s] board using the board setup as 
+    described in file [f].*)
+let generate_custom (filename:filename) (board_dim:int): t = 
+  if Filename.check_suffix filename ".txt" then begin 
+    let open_file = (try (open_in filename) with
+        | Sys_error f -> raise (InvalidFile f)) in 
+    let rec read_loop chan file (acc: node list) (pos: int) : node list = 
+      match (input_char chan) with
+      |exception End_of_file -> begin 
+          if (pos = board_dim*board_dim) then acc
+          else raise (InvalidSize board_dim)
+        end 
+      | '\n' -> read_loop chan file acc pos
+      | l -> if l = ' ' then read_loop chan file acc pos else begin 
+          (read_loop chan file ((create_node l pos)::acc) (pos+1))
+        end in 
+    let node_list = (List.rev(read_loop open_file filename [] 0)) in
+    {nodes=node_list; words=Trie.empty}
+  end else raise (InvalidFile filename)
 
 (** [positions of neighbors node b] returns the list of positions of 
     neighboring elements on the board. *)
@@ -137,21 +183,31 @@ let nodes_of_neighbors (node:node) (board:t) : node list =
     | h::t -> rec_nodes t ((get_node h board)::acc)
   in rec_nodes neighbor_positions []
 
-(** [get_string_from_nodes] when given a list of nodes, will return the string formed by the nodes (but in reverse order - the reason for this is to optimize accessing nodes from the front as prepending is faster than appending) *)
+(** [get_string_from_nodes] when given a list of nodes, will return the string 
+    formed by the nodes (but in reverse order - the reason for this is to optimize 
+    accessing nodes from the front as prepending is faster than appending) *)
 let get_string_from_nodes (nodes:node list) : string = 
   let char_array = List.map (fun x -> x.letter) nodes in 
   let string_array = List.map (fun x -> Char.escaped x) char_array in 
   List.fold_left (fun acc x -> x^acc) "" string_array
 
-(** [get_BFS_neighbors] returns a sequence of nodes; gets neighbors of last node in the sequence, and then subtracts from these neighbors any nodes that are already present in the sequence. This is used only for the BFS traversal; which is finding all the possible words on a board in [populate_board] *)
+(** [get_BFS_neighbors] returns a sequence of nodes; gets neighbors of last 
+    node in the sequence, and then subtracts from these neighbors any nodes that
+    are already present in the sequence. This is used only for the BFS traversal;
+    which is finding all the possible words on a board in [populate_board] *)
 let get_BFS_neighbors (nodes:node list) board : node list =
   match nodes with
   | [] -> []
   | last_node::t -> let neighbor_nodes = nodes_of_neighbors last_node board in
     List.filter (fun x -> not (List.mem x nodes)) neighbor_nodes 
 
-(** [process_neighbors] is used for the BFS traversal to find all the possible words on a board. This is only part of the algorithm; it only adds one letter to the node_lst, for example, if the queue passed in "ABC" then this would only process one valid neighboring character, like "ABCD," "ABCE", "ABCF" ... and so on. *)
-let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_acc:Trie.t) (neighbor_nodes:node list) : Trie.t = 
+(** [process_neighbors] is used for the BFS traversal to find all the possible 
+    words on a board. This is only part of the algorithm; it only adds one 
+    letter to the node_lst, for example, if the queue passed in "ABC" then this 
+    would only process one valid neighboring character, like "ABCD," "ABCE", 
+    "ABCF" ... and so on. *)
+let rec process_neighbors q (node_lst:node list) (str:string) (board:t) 
+    (words_acc:Trie.t) (neighbor_nodes:node list) : Trie.t = 
   match neighbor_nodes with 
   | [] -> process_queue q board words_acc 
   | n_node::t -> begin 
@@ -160,49 +216,66 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
       if Trie.contains_prefix english_words new_str = false 
       then process_queue q board words_acc 
       else 
-        if Trie.contains english_words new_str = true then 
+      if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
         process_neighbors q node_lst str board words_acc t
-        else let () = Queue.add new_nodes q in 
+      else let () = Queue.add new_nodes q in 
         process_neighbors q node_lst str board words_acc t
     end 
 
-(** [process_queue] is used for the BFS traversal to find all the possible words on a board. It processes the entire queue holding all of the possible node sequences; essentially a loop for while the queue isn't empty *)
+(** [process_queue] is used for the BFS traversal to find all the possible 
+    words on a board. It processes the entire queue holding all of the possible 
+    node sequences; essentially a loop for while the queue isn't empty *)
 and process_queue q (board:t) (words_acc:Trie.t) : Trie.t = 
   if Queue.is_empty q then words_acc else
     let node_lst = Queue.take q in 
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
     if Trie.contains english_words new_str = true then 
-    let words_acc = Trie.add_word words_acc new_str in 
-    process_neighbors q node_lst new_str board words_acc neighbor_nodes
+      let words_acc = Trie.add_word words_acc new_str in 
+      process_neighbors q node_lst new_str board words_acc neighbor_nodes
     else process_neighbors q node_lst new_str board words_acc neighbor_nodes
 
 
-(** [process_node] is used for the BFS traversal to find all the possible words on a board. It returns a list of valid english words starting with the character in the node parameter. *)
+(** [process_node] is used for the BFS traversal to find all the possible words
+    on a board. It returns a list of valid english words starting with the
+    character in the node parameter. *)
 let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
   let q = Queue.create () in 
   match List.map (fun x -> Queue.add x q) nodes with
   | [] -> process_queue q board words_acc  
   | h::t -> process_queue q board words_acc  
 
-(** [populate_board_words] is a helper function for [populate_board] to start the BFS algorithm on the ndoes of the board. Since [process_node] takes in a list of nodes as each vertex for its BFS traversal, this function accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
+(** [populate_board_words] is a helper function for [populate_board] to start 
+    the BFS algorithm on the ndoes of the board. Since [process_node] takes in a 
+    list of nodes as each vertex for its BFS traversal, this function
+    accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
 let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
   let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 
   process_node nodes_for_q board Trie.empty
 
-(** [populate_board] actually populates the board with all the possible words that it can form from a BFS traversal. *)
+(** [populate_board] actually populates the board with all the possible words 
+    that it can form from a BFS traversal. *)
 let rec populate_board (board:t) : t =
   let trie = populate_board_words board.nodes board Trie.empty in 
   {nodes=board.nodes;words=trie}
 
 (** [generate] creates a board given a board type.  *)
 let generate (board_type:board_type) : t = 
+  let () = Random.self_init () in 
   match board_type with 
-  | Standard size -> if size = 4 then generate_standard_4 
-    else raise (InvalidSize size)
+  | Standard size -> if size = 4 then begin 
+      generate_standard (create_die_arr "4x4.txt" 4) 4
+    end else if size = 5 then begin
+      generate_standard (create_die_arr "5x5.txt" 5) 5
+    end else raise (InvalidSize size)
   | Random size -> (generate_random size)
+  | Custom_die(file, size) -> if size <= 30 then begin
+      generate_standard (create_die_arr file size) size 
+    end else raise (InvalidSize size)
+  | Custom_board(file, size) -> if size <=30 then begin 
+      generate_custom file size end else raise(InvalidSize size)
 
 (** [get_node_letter l lst acc] filters the node list [lst] and returns a
     only the nodes containing letter [l]. *)
@@ -235,26 +308,30 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     (process_nlist possible_neighbors false)
   end
 
+
 (** [is_valid_word w b] returns true if [w] is contained in the english
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  (*if Trie.contains english_words (String.lowercase_ascii word) then begin *)
-  let upper_word = String.uppercase_ascii word in
-  let first_char = upper_word.[0] in 
-  let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
-  let rec node_loop lst acc = 
-    match lst with
-    | [] -> acc
-    | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
-  (node_loop nodes_fst_letter false)
-(*end else false*)
+  if Trie.contains english_words (String.lowercase_ascii word) then begin 
+    let upper_word = String.uppercase_ascii word in
+    let first_char = upper_word.[0] in 
+    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+    let rec node_loop lst acc = 
+      match lst with
+      | [] -> acc
+      | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
+    (node_loop nodes_fst_letter false)
+  end else false
+
 
 (** [word_score] computes the score of a word in the context of a board. *)
 let word_score (word:string) (board:t) : int =
   String.length word 
 
-(** [get_possible_words] gets all of the possible words of a board, which is contained in board.words (which we populate via the [populate_board] method)  *)
+(** [get_possible_words] gets all of the possible words of a board, which is 
+    contained in board.words (which we populate via the [populate_board] method) 
+*)
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
 

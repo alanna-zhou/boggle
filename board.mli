@@ -12,20 +12,30 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
+(** The file name of file with required data. *)
+type filename = string 
+
 (** Raised when board size [size] is not allowed. *)
 exception InvalidSize of size 
+
+(** Raised when file [file] is not formatted correctly. *)
+exception InvalidFile of filename
 
 (** The type of a board, where standard is configured using 6 sided die for
     each board position, and where random randomnly choose a letter from the
     alphabet for each board element. *)
-type board_type = Standard of size | Random of size 
-
+type board_type = 
+  | Standard of size 
+  | Random of size 
+  | Custom_die of (filename * size) 
+  | Custom_board of (filename * size)
 
 (** [generate size] generates a board of dimensions [size] x [size]. It uses
     the standard die to decide each letter on the board. 
     @param size is the size of the board you want to generate
     @return board is the board created
-    Raises: InvalidSize if a board of the specified size cannot be generated.
+    Raises: [InvalidSize] if a board of the specified size cannot be generated.
+    [InvalidFile] if the file provided is not correctly formatted.
     Requires: Standard board must be of size 4, random boards can be of any
     size. 
     Example: [generate (Standard 4)]*)
