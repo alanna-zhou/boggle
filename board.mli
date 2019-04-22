@@ -99,6 +99,22 @@ val format : t -> size -> unit
 val testing_board1: unit -> t
 
 
+(** [testing_board2 ()] returns a Standard board for testing purposes.
+    @param unit the standard
+    @return board for testing
+    Raises: No Exceptions
+    Example: [testing_board1 ()] returns a board.*)
+val testing_board2: unit -> t
+
+
+(** [testing_board3 ()] returns a Standard board for testing purposes.
+    @param unit the standard
+    @return board for testing
+    Raises: No Exceptions
+    Example: [testing_board1 ()] returns a board.*)
+val testing_board3: unit -> t
+
+
 
 
 

@@ -29,23 +29,22 @@ let vowels = [|'A';'E';'I';'O';'U'|]
 
 let english_words = add_words_from_file "usa.txt"
 
-let die_0 = [|'R';'I';'F';'O';'B';'X'|]
-let die_1 = [|'I';'F';'E';'H';'E';'Y'|]
-let die_2 = [|'D';'E';'N';'O';'W';'S'|]
-let die_3 = [|'U';'T';'O';'K';'N';'D'|]
-let die_4 = [|'H';'M';'S';'R';'A';'O'|]
-let die_5 = [|'L';'U';'P';'E';'T';'S'|]
-let die_6 = [|'A';'C';'I';'T';'O';'A'|]
-let die_7 = [|'Y';'L';'G';'K';'U';'E'|]
-let die_8 = [|'Q';'B';'M';'J';'O';'A'|]
-let die_9 = [|'E';'H';'I';'S';'P';'N'|]
-let die_10 = [|'V';'E';'T';'I';'G';'N'|]
-let die_11 = [|'R';'I';'F';'O';'B';'X'|]
-let die_12 = [|'E';'Z';'A';'V';'N';'D'|]
-let die_13 = [|'R';'A';'L';'E';'S';'C'|]
-let die_14 = [|'U';'W';'I';'L';'R';'G'|]
-let die_15 = [|'P';'A';'C';'E';'M';'D'|]
+let scrabble_points = [(1, ['A';'E';'I';'O';'U';'L';'N';'S';'T';'R']); 
+                       (2, ['D';'G']); 
+                       (3, ['B';'C';'M';'P']); 
+                       (4, ['F';'H';'V';'W';'Y']); 
+                       (5, ['K']); 
+                       (8, ['J';'K']); 
+                       (10, ['Q';'Z']) ]
 
+let get_letter_score (c:char) : int = 
+  let rec helper lst = 
+    match lst with 
+    | [] -> 0
+    | (score, [])::t -> helper t 
+    | (score, letters)::t -> if List.mem (Char.uppercase_ascii c) letters 
+      then score else helper t 
+  in helper scrabble_points
 
 (** [create_die_arr f s] creates an array of character arrays of die as listed
     in filename [f] of length [s]*[s]. This array contains the 6 sided 
@@ -68,6 +67,8 @@ let create_die_arr (filename:string) (board_dim:int) : (char array) array =
       | l  -> read_loop chan file acc (l::acc2)  in 
     Array.of_list (List.rev (read_loop open_file filename [] []))
   end else raise (InvalidFile(filename))
+
+
 
 (** [create_node l p] creates a node, to be placed in a board, with
     the field letter set as l, position set as p, and points set to
@@ -213,9 +214,6 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t)
   | n_node::t -> begin 
       let new_nodes = n_node::node_lst in 
       let new_str = str^Char.escaped n_node.letter in 
-      if Trie.contains_prefix english_words new_str = false 
-      then process_queue q board words_acc 
-      else 
       if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
@@ -232,6 +230,9 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
     let node_lst = Queue.take q in 
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
+    if Trie.contains_prefix english_words new_str = false 
+    then process_queue q board words_acc 
+    else 
     if Trie.contains english_words new_str = true then 
       let words_acc = Trie.add_word words_acc new_str in 
       process_neighbors q node_lst new_str board words_acc neighbor_nodes
@@ -241,7 +242,8 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
 (** [process_node] is used for the BFS traversal to find all the possible words
     on a board. It returns a list of valid english words starting with the
     character in the node parameter. *)
-let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie.t = 
+let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): 
+  Trie.t = 
   let q = Queue.create () in 
   match List.map (fun x -> Queue.add x q) nodes with
   | [] -> process_queue q board words_acc  
@@ -251,7 +253,8 @@ let rec process_node (nodes:(node list) list) (board:t) (words_acc:Trie.t): Trie
     the BFS algorithm on the ndoes of the board. Since [process_node] takes in a 
     list of nodes as each vertex for its BFS traversal, this function
     accumulates the [node0;node1;node2] into [[node0];[node1];[node2]] *)
-let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : Trie.t = 
+let rec populate_board_words (nodes:node list) (board:t) (word_list:Trie.t) : 
+  Trie.t = 
   let nodes_for_q = List.fold_left (fun acc x -> [x]::acc) [] nodes in 
   process_node nodes_for_q board Trie.empty
 
@@ -325,9 +328,17 @@ let is_valid_word (word:string) (board:t) : bool =
   end else false
 
 
+let string_to_chars (word:string) : char list = 
+  let rec helper index acc = 
+    if index < 0 then acc
+    else helper (index-1) (word.[index]::acc) in 
+  helper (String.length word - 1) []
+
+
 (** [word_score] computes the score of a word in the context of a board. *)
 let word_score (word:string) (board:t) : int =
-  String.length word 
+  let char_lst = string_to_chars word in 
+  List.fold_left (fun acc c -> get_letter_score c + acc) 0 char_lst
 
 (** [get_possible_words] gets all of the possible words of a board, which is 
     contained in board.words (which we populate via the [populate_board] method) 
@@ -367,6 +378,30 @@ let testing_board1 () =
                    {letter='C'; position=15};] in
   {nodes=node_list; words=Trie.empty}  
 
+let testing_board2 () = 
+  let node_list = [{letter='B'; position=0}; 
+                   {letter='A'; position=1}; 
+                   {letter='D'; position=2}; 
+                   {letter='E'; position=3}] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b
 
+
+let node0 = {letter='B'; position=0}
+let node1 = {letter='A'; position=1}
+let node2 = {letter='T'; position=2}
+let node3 = {letter='D'; position=3}
+let node4 = {letter='E'; position=4}
+let node5 = {letter='L'; position=5}
+let node6 = {letter='S'; position=6}
+let node7 = {letter='N'; position=7}
+let node8 = {letter='E'; position=8}
+
+let testing_board3 () = 
+  let node_list = [node0;node1;node2;node3;node4;node5;node6;node7;node8] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b
+
+let board3 = testing_board3 ()
 
 
