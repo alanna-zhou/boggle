@@ -305,6 +305,14 @@ let testing_board1 () =
                    {letter='C'; position=15};] in
   {nodes=node_list; words=Trie.empty}  
 
+let testing_board2 () = 
+  let node_list = [{letter='B'; position=0}; 
+                   {letter='A'; position=1}; 
+                   {letter='D'; position=2}; 
+                   {letter='E'; position=3}] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b
+
 
 
 
