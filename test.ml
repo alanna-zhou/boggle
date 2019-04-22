@@ -86,11 +86,31 @@ let trie_tests = [
 let bfs_tests = [
   " B A
     D E board BFS" >:: (fun _ -> assert_equal (true)
-                        (cmp_set_like_lists (get_possible_words board2) ["ba"; "bead"; "bea"; "beda"; "bed"; "be";"abd"; "abed"; "abe"; "ab"; "ade"; "ad"; "ae"; "a"; "dea"; "deba"; "deb"; "de"; "dab"; "dae"; "da"; "ea"; "ed"; "eb"] ));
+                        (cmp_set_like_lists (get_possible_words board2) ["bade"; "bad"; "ba"; "bead"; "bea"; "beda"; "bed"; "be"; "b"; "abd"; "abed";
+ "abe"; "ab"; "ade"; "ad"; "ae"; "a"; "dea"; "deba"; "deb"; "de"; "dab"; "dae";
+ "da"; "d"; "ea"; "ed"; "eb"; "e"] ));
   " B A T
     D E L
     S N E board BFS" >:: (fun _ -> assert_equal (true)
-                        (cmp_set_like_lists (get_possible_words board3) ["bat"; "bale"; "bal"; "bade"; "bad"; "ba"; "bead"; "bea"; "bes"; "bele"; "bel"; "beda"; "bed"; "beel"; "been"; "bee"; "bet"; "ben"; "be"; "ae"; "abd"; "abe"; "ab"; "ate"; "at"; "ale"; "al"; "ad"; "a"; "deale"; "deal"; "dea"; "deba"; "deb"; "des"; "dele"; "del"; "dee"; "det"; "den"; "de"; "dn"; "dae"; "dab"; "dat"; "dale"; "dal"; "da"; "lend"; "lens"; "len"; "lee"; "le"; "sn"; "sea"; "seb"; "sele"; "sel"; "sed"; "seen"; "see"; "set"; "sen"; "se"; "ea"; "eb"; "es"; "ed"; "et"; "ele"; "el"; "ene"; "ende"; "enda"; "end"; "ens"; "enl"; "en"; "ee"] ));
+                        (cmp_set_like_lists (get_possible_words board3) ["bates"; "bated"; "bate"; "bat"; "bales"; "bale"; "bal"; "bade"; "bad"; "ba";
+ "beat"; "beads"; "bead"; "bea"; "bes"; "belt"; "belat"; "bela"; "bele"; "bel";
+ "beds"; "beda"; "bed"; "beel"; "been"; "bee"; "beta"; "bet"; "bends"; "bend";
+ "bene"; "ben"; "be"; "b"; "ae"; "abd"; "abel"; "abed"; "abet"; "abe"; "ab";
+ "ate"; "at"; "alte"; "ales"; "ale"; "al"; "adel"; "aden"; "ade"; "ad"; "a";
+ "tabe"; "tab"; "taleb"; "tales"; "talen"; "tale"; "tal"; "tad"; "ta"; "teal";
+ "tea"; "tele"; "tel"; "ted"; "teens"; "teen"; "tee"; "tends"; "tend"; "tene";
+ "tens"; "ten"; "te"; "t"; "dealt"; "deale"; "deal"; "dea"; "deba"; "deb";
+ "des"; "delta"; "dela"; "dele"; "del"; "dee"; "det"; "dens"; "den"; "de";
+ "dn"; "dae"; "dab"; "dates"; "datel"; "date"; "dat"; "dales"; "dale"; "dal";
+ "da"; "d"; "labe"; "lab"; "lates"; "latene"; "laten"; "late"; "lat"; "lads";
+ "laden"; "lade"; "lad"; "la"; "leads"; "lead"; "lea"; "leb"; "les"; "led";
+ "let"; "lends"; "lende"; "lend"; "lens"; "len"; "lees"; "leeds"; "leed";
+ "lee"; "le"; "l"; "sn"; "seab"; "seat"; "seale"; "seal"; "sea"; "seb"; "sele";
+ "sel"; "sed"; "seen"; "see"; "set"; "send"; "sene"; "sen"; "se"; "s"; "neat";
+ "nea"; "neb"; "nes"; "net"; "nel"; "needs"; "need"; "nee"; "ne"; "n"; "eat";
+ "ea"; "eb"; "es"; "ed"; "eta"; "et"; "ele"; "elates"; "elated"; "elate";
+ "elab"; "ela"; "el"; "ene"; "ends"; "endea"; "ende"; "enda"; "end"; "ens";
+ "enl"; "en"; "eel"; "ee"; "e"]));
                         (* missing seat and dealt *)
 ]
 
