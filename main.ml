@@ -2,27 +2,47 @@ open Board
 open Command
 open State
 
-(** type to represent the game *)
 type game = {
   state : State.t;
 }
-
-(** [make_list] returns a list as a string separated by semi-colons. *)
-let rec make_list lst acc =
+let clear x = Sys.command("clear")+x
+let rec make_list lst acc=
   match lst with 
   |[]-> acc
   |h::t-> make_list t (h ^ "; " ^ acc)
 
-(** [start_game] starts the game and allows for user input.  *)
-let rec start_game () =
+let rec prompt_board_size () =
+  try 
+    let size = int_of_string (read_line()) in size
+  with 
+  |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
+    prompt_board_size ()
+
+and prompt_board_type () =
   print_endline "\nWhat kind of board would you like?";
-  print_string  "\nType s for Standard and r for Random. : "; 
+  print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
-  |"s" -> playing_game (Unix.time() +. 90.) 
-            (State.init (Board.generate (Standard (4)))) []
-  |"r" -> playing_game (Unix.time() +. 90.) 
-            (State.init (Board.generate (Random(4)))) []
-  |_-> print_endline "\nInvalid entry"; start_game ()
+  |"s" -> print_string "Would you like the board to be a 4x4 or 5x5?";
+    let s = prompt_board_size () in 
+    if s =4 || s = 5 then
+      playing_game (Unix.time() +. 90.) 
+        (State.init (Board.generate (Standard (s)))) []
+    else ANSITerminal.(print_string [red] "\nInvalid entry";
+                       prompt_board_type ());
+
+  |"r" -> print_string "What size board would you like? Entry must be less than 30.";
+    let s = prompt_board_size () in 
+    if s < 31 
+    then playing_game (Unix.time() +. 90.) 
+        (State.init (Board.generate (Random (s)))) []
+    else print_string "\nRandom size must be less than or equal to 30."; 
+    prompt_board_type ()
+
+  |"c" ->     let s = prompt_board_size () in 
+    playing_game (Unix.time() +. 90.) 
+      (State.init (Board.generate (Random(s)))) []
+  |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; prompt_board_type ());
+
 and playing_game time st found_wrds =
   let () = Random.self_init () in 
   if is_game_over time
@@ -44,39 +64,46 @@ To quit/restart game, enter #quit.
 To see instructions, enter #help.";
         playing_game time st found_wrds
       |Entry (guess) -> 
+        ignore(clear 0);
         if is_game_over time then end_game st 
         else if List.mem guess found_wrds then playing_game time st found_wrds
         else if not (Board.is_valid_word guess (State.board st)) 
         then raise (Failure guess)
         else playing_game time (State.update st guess) (guess :: found_wrds)
     with 
-    |Failure x -> print_endline (x ^ " is not a valid input."); 
+    |Failure x -> ignore(clear 0);
+      ANSITerminal.(print_string [red] (x));
+      print_string (" is not a valid input."); 
       playing_game time st found_wrds
-    |Empty -> print_string "\nEntry is empty, choose another word.";
+    |Empty -> ignore(clear 0); 
+      ANSITerminal.(print_string [red] "\nEntry is empty, choose another word.");
       playing_game time st found_wrds
 
-(** [end_game] ends the game.  *)
 and end_game st =
-  print_string("\nGame Over \nYour score: " ^ (string_of_int (State.score st))); 
+  ANSITerminal.(print_string [red] "\nGame Over)); 
+  print_string (\nYour score: ");
+  ANSITerminal.(print_string [green](string_of_int (State.score st))); 
   prompt_end ()
 
-(** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
 and prompt_end () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
-  |"y" -> start_game ()
+  |"y" -> prompt_board_type ()
   |"n" -> ()
-  |_ -> print_string "Not a valid input."; prompt_end ()
+  |_ -> ANSITerminal.(print_string [red]"Not a valid input."); prompt_end ()
+
 and is_game_over time =
   Unix.time () >= time
 
-(** [main] initializes and executes the game.  *)
-let main () =
-  print_string "Welcome to Word Blitz! At any time, type #help for the gameplay
-   instructions. \n";
-  start_game ()
 
-let () = main ()
+let main () =
+  ignore (clear 0);
+  print_string "Welcome to Word Blitz! Form and enter words contained on the
+board by connecting letters horizontally, vertically, or diagonally.
+At any time, type #help for gameplay instructions. \n";
+  prompt_board_type ()
+
+let () = main()
 
 
 

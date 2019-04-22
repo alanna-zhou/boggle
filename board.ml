@@ -346,17 +346,38 @@ let word_score (word:string) (board:t) : int =
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
 
-(** [format] formats the board in string form.  *)
-let rec format board size = 
+
+(*helps format. Does top boarder of board*)
+let rec hborder size =
+  match size with 
+  |0 -> ()
+  |n -> print_string"-"; hborder (size-1)
+
+(*helps format. Does middle of board*)
+let rec mid_board board size=
   match board.nodes with
   | [] -> ()
   | h::t -> begin
-      let () = if (h.position + 1) mod size = 0 then begin
-          (print_char h.letter ; print_string " " ; print_string "\n")
-        end else 
-          (print_char h.letter; print_string " ") in 
-      (format {board with nodes=t} size)
-    end 
+      if t = [] then
+        let () = if (h.position + 1) mod size = 0 then begin
+            (print_char h.letter ; print_string " " ; print_string "|\n")
+          end else 
+            (print_char h.letter; print_string " ") in 
+        (mid_board {board with nodes=t} size)
+      else
+        let () = if (h.position + 1) mod size = 0 then begin
+            (print_char h.letter ; print_string " " ; print_string "|\n|")
+          end else 
+            (print_char h.letter; print_string " ") in 
+        (mid_board {board with nodes=t} size)
+    end
+
+(** [format] formats the board in string form.  *)
+let rec format board size = 
+  hborder (2*size+2);
+  print_string "\n|";
+  mid_board board size;
+  hborder (2*size+2)
 
 (** Used to help test *)
 let testing_board1 () = 
