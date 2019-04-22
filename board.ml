@@ -214,12 +214,6 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t)
   | n_node::t -> begin 
       let new_nodes = n_node::node_lst in 
       let new_str = str^Char.escaped n_node.letter in 
-<<<<<<< HEAD
-      if Trie.contains_prefix english_words new_str = false 
-      then process_queue q board words_acc 
-      else 
-=======
->>>>>>> 7df8454c6c5acd7860c5dd263c394842b958e9be
       if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
