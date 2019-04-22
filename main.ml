@@ -44,6 +44,7 @@ and prompt_board_type () =
   |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; prompt_board_type ());
 
 and playing_game time st found_wrds =
+  let () = Random.self_init () in 
   if is_game_over time
   then 
     end_game  st

@@ -3,6 +3,7 @@ type command =
   |Quit
   |Score 
   |Help
+  |Hint
   |Entry of string
 
 (** Raised when an empty command is parsed *)
