@@ -311,6 +311,15 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     (process_nlist possible_neighbors false)
   end
 
+let is_word_on_board (word:string) (board:t) : bool =
+  let upper_word = String.uppercase_ascii word in
+  let first_char = upper_word.[0] in 
+  let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+  let rec node_loop lst acc = 
+    match lst with
+    | [] -> acc
+    | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
+  (node_loop nodes_fst_letter false)
 
 (** [is_valid_word w b] returns true if [w] is contained in the english
     dictionary and could be formed following the rules on board [b], and false
@@ -341,11 +350,10 @@ let word_score (word:string) (board:t) : int =
   List.fold_left (fun acc c -> get_letter_score c + acc) 0 char_lst
 
 (** [get_possible_words] gets all of the possible words of a board, which is 
-    contained in board.words (which we populate via the [populate_board] method) 
+    contained in board.words (which we populate via the [populate_board] method)
 *)
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
-
 
 (*helps format. Does top boarder of board*)
 let rec hborder size =
