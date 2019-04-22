@@ -2,6 +2,7 @@
 open Board
 open Trie
 
+(** type to represent a state *)
 type t = {
   board : Board.t;
   score : int;

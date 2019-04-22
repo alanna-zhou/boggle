@@ -75,14 +75,14 @@ val get_possible_words: t -> string list
      on the given formatter. 
      @param b is the board you want to print out
      @param size is the height/width of the board you want to print out.
-     @return unit 
+     @return unit the standard
      Requires: Board b must be square.
      Raises: No Exceptions
      Example: [format b 4] prints out the board to the console. *)
 val format : t -> size -> unit 
 
 (** [testing_board1 ()] returns a Standard board for testing purposes.
-    @param unit
+    @param unit the standard
     @return board for testing
     Raises: No Exceptions
     Example: [testing_board1 ()] returns a board.*)

@@ -1,14 +1,14 @@
-(**The type [command] represents a possible player command *)
+(** The type [command] represents a possible player command *)
 type command =
   |Quit
   |Score 
   |Help
   |Entry of string
 
-(**Raised when an empty command is parsed *)
+(** Raised when an empty command is parsed *)
 exception Empty
 
-(**[parse str] is a command associated with [str]
+(** [parse str] is a command associated with [str]
 
     Requires: [str] is a valid string
     Raises: Empty if the input is just whitespace

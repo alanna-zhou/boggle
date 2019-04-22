@@ -35,3 +35,8 @@ visited.(0) <- true;;
 #trace process_neighbors;;
 let p = process_neighbors q node0 testing "B" Trie.empty visited [1;2;3];;
 Trie.to_list p;;
+
+#use "board.ml";;
+let b = generate_random 3;;
+let p = populate_board b;;
+Trie.to_list p.words;;
