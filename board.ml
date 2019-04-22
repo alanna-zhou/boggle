@@ -168,11 +168,11 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
       if Trie.contains_prefix english_words new_str = false 
       then process_queue q board words_acc 
       else 
-        if Trie.contains english_words new_str = true then 
+      if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
         process_neighbors q node_lst str board words_acc t
-        else let () = Queue.add new_nodes q in 
+      else let () = Queue.add new_nodes q in 
         process_neighbors q node_lst str board words_acc t
     end 
 
@@ -183,8 +183,8 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
     if Trie.contains english_words new_str = true then 
-    let words_acc = Trie.add_word words_acc new_str in 
-    process_neighbors q node_lst new_str board words_acc neighbor_nodes
+      let words_acc = Trie.add_word words_acc new_str in 
+      process_neighbors q node_lst new_str board words_acc neighbor_nodes
     else process_neighbors q node_lst new_str board words_acc neighbor_nodes
 
 
@@ -273,17 +273,38 @@ let word_score (word:string) (board:t) : int =
 let get_possible_words (board:t) : string list = 
   Trie.to_list (board.words)
 
-(** [format] formats the board in string form.  *)
-let rec format board size = 
+
+(*helps format. Does top boarder of board*)
+let rec hborder size =
+  match size with 
+  |0 -> ()
+  |n -> print_string"-"; hborder (size-1)
+
+(*helps format. Does middle of board*)
+let rec mid_board board size=
   match board.nodes with
   | [] -> ()
   | h::t -> begin
-      let () = if (h.position + 1) mod size = 0 then begin
-          (print_char h.letter ; print_string " " ; print_string "\n")
-        end else 
-          (print_char h.letter; print_string " ") in 
-      (format {board with nodes=t} size)
-    end 
+      if t = [] then
+        let () = if (h.position + 1) mod size = 0 then begin
+            (print_char h.letter ; print_string " " ; print_string "|\n")
+          end else 
+            (print_char h.letter; print_string " ") in 
+        (mid_board {board with nodes=t} size)
+      else
+        let () = if (h.position + 1) mod size = 0 then begin
+            (print_char h.letter ; print_string " " ; print_string "|\n|")
+          end else 
+            (print_char h.letter; print_string " ") in 
+        (mid_board {board with nodes=t} size)
+    end
+
+(** [format] formats the board in string form.  *)
+let rec format board size = 
+  hborder (2*size+2);
+  print_string "\n|";
+  mid_board board size;
+  hborder (2*size+2)
 
 (** Used to help test *)
 let testing_board1 () = 

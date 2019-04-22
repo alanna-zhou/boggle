@@ -5,7 +5,7 @@ open State
 type game = {
   state : State.t;
 }
-let clear = function x -> Sys.command("clear")+x
+let clear x = Sys.command("clear")+x
 let rec make_list lst acc=
   match lst with 
   |[]-> acc
@@ -19,24 +19,28 @@ let rec prompt_board_size () =
     prompt_board_size ()
 
 and prompt_board_type () =
-  let s = prompt_board_size () in
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
   |"s" -> print_string "Would you like the board to be a 4x4 or 5x5?";
+    let s = prompt_board_size () in 
     if s =4 || s = 5 then
       playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Standard (s)))) []
     else ANSITerminal.(print_string [red] "\nInvalid entry";
                        prompt_board_type ());
-  |"r" -> 
+
+  |"r" -> print_string "What size board would you like? Entry must be less than 30.";
+    let s = prompt_board_size () in 
     if s < 31 
     then playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Random (s)))) []
     else print_string "\nRandom size must be less than or equal to 30."; 
     prompt_board_type ()
-  |"c" -> playing_game (Unix.time() +. 90.) 
-            (State.init (Board.generate (Custom))) []
+
+  |"c" ->     let s = prompt_board_size () in 
+    playing_game (Unix.time() +. 90.) 
+      (State.init (Board.generate (Random(s)))) []
   |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; prompt_board_type ());
 
 and playing_game time st found_wrds =
@@ -92,10 +96,10 @@ and is_game_over time =
 
 
 let main () =
+  ignore (clear 0);
   print_string "Welcome to Word Blitz! Form and enter words contained on the
-   board by connecting letters horizontally, vertically, or diagonally.
-    At any time, type #help for 
-   gameplay instructions. \n";
+board by connecting letters horizontally, vertically, or diagonally.
+At any time, type #help for gameplay instructions. \n";
   prompt_board_type ()
 
 let () = main()
