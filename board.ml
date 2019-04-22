@@ -165,9 +165,6 @@ let rec process_neighbors q (node_lst:node list) (str:string) (board:t) (words_a
   | n_node::t -> begin 
       let new_nodes = n_node::node_lst in 
       let new_str = str^Char.escaped n_node.letter in 
-      if Trie.contains_prefix english_words new_str = false 
-      then process_queue q board words_acc 
-      else 
         if Trie.contains english_words new_str = true then 
         let words_acc = Trie.add_word words_acc new_str in 
         let () = Queue.add new_nodes q in 
@@ -182,6 +179,9 @@ and process_queue q (board:t) (words_acc:Trie.t) : Trie.t =
     let node_lst = Queue.take q in 
     let neighbor_nodes = get_BFS_neighbors node_lst board in 
     let new_str = get_string_from_nodes node_lst in 
+    if Trie.contains_prefix english_words new_str = false 
+    then process_queue q board words_acc 
+    else 
     if Trie.contains english_words new_str = true then 
     let words_acc = Trie.add_word words_acc new_str in 
     process_neighbors q node_lst new_str board words_acc neighbor_nodes
@@ -314,5 +314,21 @@ let testing_board2 () =
   populate_board b
 
 
+let node0 = {letter='B'; position=0}
+let node1 = {letter='A'; position=1}
+let node2 = {letter='T'; position=2}
+let node3 = {letter='D'; position=3}
+let node4 = {letter='E'; position=4}
+let node5 = {letter='L'; position=5}
+let node6 = {letter='S'; position=6}
+let node7 = {letter='N'; position=7}
+let node8 = {letter='E'; position=8}
+
+let testing_board3 () = 
+  let node_list = [node0;node1;node2;node3;node4;node5;node6;node7;node8] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b
+
+let board3 = testing_board3 ()
 
 

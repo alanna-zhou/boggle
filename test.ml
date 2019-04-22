@@ -5,6 +5,7 @@ open Trie
 
 let board = testing_board1 ()
 let board2 = testing_board2 ()
+let board3 = testing_board3 ()
 
 let state_0 = init board
 let state_1 = update state_0 "i"
@@ -82,10 +83,15 @@ let trie_tests = [
   "to_list test" >:: (fun _ -> assert_equal true (cmp_set_like_lists ["computer"; "computers"] (to_list trie2)))
 ]
 
-let all_possible_words = get_possible_words board2
 let bfs_tests = [
-  "BADE board BFS" >:: (fun _ -> assert_equal (true)
-                        (cmp_set_like_lists all_possible_words ["ba"; "bead"; "bea"; "beda"; "bed"; "be";"abd"; "abed"; "abe"; "ab"; "ade"; "ad"; "ae"; "a"; "dea"; "deba"; "deb"; "de"; "dab"; "dae"; "da"; "ea"; "ed"; "eb"] ))
+  " B A
+    D E board BFS" >:: (fun _ -> assert_equal (true)
+                        (cmp_set_like_lists (get_possible_words board2) ["ba"; "bead"; "bea"; "beda"; "bed"; "be";"abd"; "abed"; "abe"; "ab"; "ade"; "ad"; "ae"; "a"; "dea"; "deba"; "deb"; "de"; "dab"; "dae"; "da"; "ea"; "ed"; "eb"] ));
+  " B A T
+    D E L
+    S N E board BFS" >:: (fun _ -> assert_equal (true)
+                        (cmp_set_like_lists (get_possible_words board3) ["bat"; "bale"; "bal"; "bade"; "bad"; "ba"; "bead"; "bea"; "bes"; "bele"; "bel"; "beda"; "bed"; "beel"; "been"; "bee"; "bet"; "ben"; "be"; "ae"; "abd"; "abe"; "ab"; "ate"; "at"; "ale"; "al"; "ad"; "a"; "deale"; "deal"; "dea"; "deba"; "deb"; "des"; "dele"; "del"; "dee"; "det"; "den"; "de"; "dn"; "dae"; "dab"; "dat"; "dale"; "dal"; "da"; "lend"; "lens"; "len"; "lee"; "le"; "sn"; "sea"; "seb"; "sele"; "sel"; "sed"; "seen"; "see"; "set"; "sen"; "se"; "ea"; "eb"; "es"; "ed"; "et"; "ele"; "el"; "ene"; "ende"; "enda"; "end"; "ens"; "enl"; "en"; "ee"] ));
+                        (* missing seat and dealt *)
 ]
 
 let suite = "test suite for A6" >::: List.flatten [
