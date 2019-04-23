@@ -200,19 +200,6 @@ let word_blitz_art () =
 
 let main () =
   ignore (clear 0);
-<<<<<<< HEAD
-  print_string "Welcome to\n";
-  word_blitz_art ();
-  print_string "Form and enter words contained on the
-board by connecting letters horizontally, vertically, or diagonally.
-At any time, type #help for gameplay instructions. \n";
-  prompt_board_type ()
-
-let () = main()
-
-
-
-=======
   print_string "Welcome to Word Blitz! Form and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
                 diagonally.  At any time, type #help for gameplay instructions.\
@@ -224,4 +211,3 @@ let () = main()
   prompt_board_type 0 [] ()
 
 let () = main ()
->>>>>>> 94c510542b0d884bfcd1a745a38820bcef8c44f2

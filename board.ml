@@ -487,3 +487,13 @@ let is_valid_word2 (word:string) (board:t) : node list =
     | [] -> []
     | h::t -> t
   end else []
+
+  let nodes_and_colors (word:string) (board:t) : (char*color) list = 
+    let nodes_of_word = is_valid_word2 word board in 
+    if (List.length nodes_of_word > 0) then 
+      if Trie.contains english_words word then 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, Black)::acc) ) [] board.nodes
+      else 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, Black)::acc) ) [] board.nodes
+    else 
+      List.fold_left (fun acc node -> (node.letter, Black)::acc) [] board.nodes
