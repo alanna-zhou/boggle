@@ -3,6 +3,7 @@ type command =
   |Quit
   |Score 
   |Help
+  |Hint
   |Entry of string
 
 (** Raised when an empty command is parsed *)
@@ -15,4 +16,5 @@ let parse str =
   |"#quit" -> Quit
   |"#score" -> Score
   |"#help" -> Help
+  |"#hint" -> Hint
   |x -> Entry (x)

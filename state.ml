@@ -7,12 +7,18 @@ type t = {
   board : Board.t;
   score : int;
   words : Trie.t;
-  leaderboard: (int * (int list)) list 
+  leaderboard: (int * (int list)) list;
+  hints_left : int;
+  start_time : float;
+  last_times : float list;
 }
 
 (** [init] initializes a state given a board. *)
 let init (board:Board.t) (leaderboard): t = 
-  {board=board;score=0;words=Trie.empty;leaderboard = leaderboard}
+  {board=board;score=0;words=Trie.empty;leaderboard = leaderboard;
+   hints_left=3;start_time=Unix.time ();
+   last_times=[Unix.time ();Unix.time ();Unix.time ();Unix.time ();Unix.time ()]}
+
 
 (** [score] provides the score of the list of words that the player has been 
     entering to play the board in the state.  *)
@@ -29,18 +35,53 @@ let board (state:t) : Board.t =
 let words (state:t) : string list =
   Trie.to_list state.words
 
+
 let leaderboard (state:t) = 
   state.leaderboard
+
+
+
+let hint (state:t) : t =
+  if state.hints_left <= 0 then failwith "No hints remaining" else
+    {board = state.board; score = state.score - 5; words = state.words;
+     leaderboard = state.leaderboard; 
+     hints_left = state.hints_left - 1;start_time = state.start_time;
+     last_times = state.last_times}
+
+let rec get_dif times =
+  match times with
+  | [] -> 1000.0
+  | x::xs -> begin
+      match xs with
+      | [] -> 1000.0
+      | y::ys -> x -. y
+    end
+
+let fast_enough times =
+  match times with
+  | [] -> false
+  | x::xs -> let time_between = get_dif times in 
+    time_between < 5.0
+
+let multiplier score = 
+  score * 3
+
+
 
 (** [update] updates a state with a newly added word by validating if the word 
     is a valid word (on the board and in the English language - this is dependent 
     upon Board's implementation of [is_valid_word]). *)
 let update (state:t) (word:string) : t =
+  let times = (Unix.time ())::state.last_times in 
   let new_words = Trie.add_word state.words word in 
   let word_score = Board.word_score word state.board in 
-  let new_score = state.score + word_score in 
-  {board=state.board;score=new_score;words=new_words;
-   leaderboard=(leaderboard state)}
+  let new_score = if fast_enough times 
+    then state.score + (multiplier word_score) else state.score + word_score in
+  {board=state.board;score=new_score;words=new_words; 
+   leaderboard = (leaderboard state);
+   hints_left=state.hints_left;start_time=state.start_time;
+   last_times=(Unix.time ())::(state.last_times)}
+
 
 let key_compare x y = 
   if fst x < fst y then -1
@@ -73,7 +114,4 @@ let rec add_leaderboard (old_leaderboard) (score:int list) (size:int) (acc) =
       let sorted_list = List.rev (List.sort compare new_lst) in 
       add_leaderboard t sorted_list size (acc) 
     end else add_leaderboard t score size ((h_size, lst)::acc)
-
-
-
 
