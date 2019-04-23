@@ -18,6 +18,13 @@ let rec prompt_board_size () =
   |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
     prompt_board_size ()
 
+let rec prompt_board_file () =
+  try 
+    let file = read_line() in file
+  with 
+  |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
+    prompt_board_file ()
+
 and prompt_board_type () =
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
@@ -30,17 +37,27 @@ and prompt_board_type () =
     else ANSITerminal.(print_string [red] "\nInvalid entry";
                        prompt_board_type ());
 
-  |"r" -> print_string "What size board would you like? Entry must be less than 30.";
+  |"r" -> print_string "What size board would you like? Entry must be less than 20.";
     let s = prompt_board_size () in 
-    if s < 31 
+    if s < 21
     then playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Random (s)))) []
-    else print_string "\nRandom size must be less than or equal to 30."; 
+    else ANSITerminal.(print_string [red] 
+                         ("\nRandom size must be less than or equal to 20.")); 
     prompt_board_type ()
 
-  |"c" ->     let s = prompt_board_size () in 
-    playing_game (Unix.time() +. 90.) 
-      (State.init (Board.generate (Random(s)))) []
+  |"c" -> begin try 
+        print_string "What size board would you like? Entry must be less than 20.";
+        (let s = prompt_board_size () in 
+         print_string "\nEnter the file name of your custom board";
+         let f = prompt_board_file() in
+         playing_game (Unix.time() +. 90.) 
+           (State.init (Board.generate (Custom_board(f, s)))) [])
+      with 
+      |InvalidFile x -> ANSITerminal.(print_string [red] (x ^ " is not a valid file name"));
+        prompt_board_type ()
+    end
+
   |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; prompt_board_type ());
 
 and playing_game time st found_wrds =
@@ -58,7 +75,7 @@ and playing_game time st found_wrds =
       |Quit -> end_game st
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
         playing_game time st found_wrds
-      |Help -> print_string "\nTo enter a word, enter that word.
+      |Help -> print_string "\nTo guess a word, enter that word.
 To see your current score, enter #score.
 To quit/restart game, enter #quit.
 To see instructions, enter #help.";
@@ -70,6 +87,7 @@ To see instructions, enter #help.";
         else if not (Board.is_valid_word guess (State.board st)) 
         then raise (Failure guess)
         else playing_game time (State.update st guess) (guess :: found_wrds)
+      |Hint -> failwith "unimplemented";
     with 
     |Failure x -> ignore(clear 0);
       ANSITerminal.(print_string [red] (x));
@@ -80,8 +98,8 @@ To see instructions, enter #help.";
       playing_game time st found_wrds
 
 and end_game st =
-  ANSITerminal.(print_string [red] "\nGame Over)); 
-  print_string (\nYour score: ");
+  ANSITerminal.(print_string [red] "\nGame Over"); 
+  print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
   prompt_end ()
 
