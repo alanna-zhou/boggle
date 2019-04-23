@@ -46,7 +46,7 @@ and prompt_board_type (game_number: int) (leaderboard: (int * int list) list) ()
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
-  |"s" -> print_string "Would you like the board to be a 4x4 or 5x5?";
+  |"s" -> print_string "\nWould you like the board to be a 4x4 or 5x5? ";
     let s = prompt_board_size () in 
     if s =4 || s = 5 then
       playing_game (Unix.time() +. 90.) 
@@ -56,9 +56,8 @@ and prompt_board_type (game_number: int) (leaderboard: (int * int list) list) ()
     else ANSITerminal.(print_string [red] "\nInvalid entry";
                        prompt_board_type game_number leaderboard ());
 
-  |"r" -> print_string "What size board would you like? 
-      For example, entering 10 will create a 10x10 board. 
-      Entry must be less than 30.";
+  |"r" -> print_string "\nWhat size board would you like? For example, \
+                        entering 10 will create a 10x10 board. Entry must be less than 30. ";
     let s = prompt_board_size () in 
     if s < 31 && s > 5
     then playing_game (Unix.time() +. 90.) 
@@ -92,9 +91,14 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
         playing_game time st found_wrds game_number
       |Quit -> end_game game_number st 
+      |Leaderboard -> print_leaderboard (leaderboard st); 
+        playing_game time st found_wrds game_number
+      |Hint -> failwith "unimplemented"
       |Help -> print_string "\nTo enter a word, enter that word.
 To see your current score, enter #score.
 To quit/restart game, enter #quit.
+For a hint, enter #hint.
+To see your leaderboard, enter #leaderboard.
 To see instructions, enter #help.";
         playing_game time st found_wrds game_number
       |Entry (guess) -> 
@@ -118,8 +122,8 @@ To see instructions, enter #help.";
 
 (** [end_game] ends the game.  *)
 and end_game game_number st =
-  ANSITerminal.(print_string [red] "\nGame Over)); 
-  print_string (\nYour score: ");
+  ANSITerminal.(print_string [red] "\nGame Over"); 
+  print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
@@ -131,7 +135,7 @@ and end_game game_number st =
 and prompt_end game_number leaderboard () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
-  |"y" -> let () = prompt_board_type (game_number + 1) leaderboard () 
+  |"y" -> prompt_board_type (game_number + 1) leaderboard () 
   |"n" -> () 
   |_ -> ANSITerminal.(print_string [red]"Not a valid input."); 
     prompt_end game_number leaderboard ()
@@ -142,9 +146,14 @@ and is_game_over time =
 
 let main () =
   ignore (clear 0);
-  print_string "Welcome to Word Blitz! Form and enter words contained on the
-board by connecting letters horizontally, vertically, or diagonally.
-At any time, type #help for gameplay instructions. \n";
+  print_string "Welcome to Word Blitz! Form and enter words contained on the \
+                board by connecting letters horizontally, vertically, or \
+                diagonally. You cannot use a board element more than once to \
+                form a word. Play with your desired board dimensions, and \
+                configure a board the way you like. Enter #hint to see a hint,\
+                but do know that you have a maximum of 3 hints per game \
+                and it can lead to a score deduction. At any time, type #help \
+                for gameplay instructions. ";
   prompt_board_type 0 [] ()
 
 let () = main()
