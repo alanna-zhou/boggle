@@ -5,6 +5,7 @@ open Trie
 
 
 
+let lst = is_valid_word2 "need" board3
 
 let board = testing_board1 ()
 let board2 = testing_board2 ()
@@ -172,5 +173,8 @@ let () = format board_custom 4
 
 let board_custom2 = generate (Custom_board ("board2.txt", 5))
 let () = format board_custom2 5
+
+
+
 
 let _ = run_test_tt_main suite

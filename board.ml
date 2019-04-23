@@ -444,7 +444,7 @@ let rec validate_node2 (node:node) (index:int) (board:t) (str:string)
     (visited_pos:int list) (node_lst:node list): node list = 
   let new_visited_pos = (node.position::visited_pos) in 
   if index = String.length str - 1 then 
-    if List.length node_lst <> String.length str then [] else (node::node_lst)
+    if List.length node_lst <> String.length str then failwith "not valid path 1" else (node::node_lst)
   else begin
     let next_letter = str.[index + 1] in
     let neighbor_positions = positions_of_neighbors node board in 
@@ -455,13 +455,40 @@ let rec validate_node2 (node:node) (index:int) (board:t) (str:string)
       | h::t -> begin
           if (List.mem h new_visited_pos = false) then begin
             let node = get_node h board in 
-            let result = validate_node2 node (index+1) board str new_visited_pos acc in 
+            try (
+              let result = validate_node2 h 0 board upper_word [] [h] in 
+              if ((List.length result) - 1) = String.length word 
+              then process_nlist t result 
+              else process_nlist t acc 
+            ) with
+              | Failure _ -> process_nlist t acc 
+            (* let result = validate_node2 node (index+1) board str new_visited_pos acc in 
             match result with 
+            | exception _ -> process_nlist t acc 
             | [] -> []
-            | _ -> result
+            | _ -> process_nlist t result  *)
           end else process_nlist t acc
         end 
     in process_nlist possible_neighbors (node::node_lst)
+  end
+
+  let rec validate_node (node:node) (index:int) (board:t) (str:string) 
+    (visited_pos:int list) : bool = 
+  let new_visited_pos = (node.position::visited_pos) in 
+  if index = String.length str - 1 then true else begin
+    let next_letter = str.[index + 1] in
+    let neighbor_positions = positions_of_neighbors node board in 
+    let possible_neighbors = List.filter 
+        (fun x -> (get_node x board).letter = next_letter) neighbor_positions in
+    let rec process_nlist neighbor_lst acc = match neighbor_lst with
+      | [] -> acc
+      | h::t -> begin
+          if (List.mem h new_visited_pos = false) then begin
+            process_nlist t (acc || (validate_node (get_node h board) 
+                                       (index + 1) board str new_visited_pos))
+          end else process_nlist t acc
+        end in 
+    (process_nlist possible_neighbors false)
   end
 
 (** [is_valid_word w b] returns true if [w] is contained in the english
@@ -475,13 +502,30 @@ let is_valid_word2 (word:string) (board:t) : node list =
     match lst with
     | [] -> []
     | h :: t -> begin 
-      let result = validate_node2 h 0 board upper_word [] [h] in 
-      if ((List.length result) - 1) = String.length word then result else 
-      node_loop t
+      try (
+        let result = validate_node2 h 0 board upper_word [] [h] in 
+        if ((List.length result) - 1) = String.length word 
+        then result else node_loop t ) with
+      | Failure _ -> node_loop t
+      (* match result with 
+      | exception _ -> node_loop t 
+      | _ -> *)
     end 
   in match (List.rev (node_loop nodes_fst_letter)) with 
   | [] -> []
   | h::t -> t
+
+  let is_valid_word (word:string) (board:t) : bool = 
+  if Trie.contains english_words (String.lowercase_ascii word) then begin 
+    let upper_word = String.uppercase_ascii word in
+    let first_char = upper_word.[0] in 
+    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+    let rec node_loop lst acc = 
+      match lst with
+      | [] -> acc
+      | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
+    (node_loop nodes_fst_letter false)
+  end else false
 
   let nodes_and_colors (word:string) (board:t) : (char*color) list = 
     let helper = 

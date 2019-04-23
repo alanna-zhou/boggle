@@ -118,6 +118,13 @@ val testing_board3: unit -> t
 
 val nodes_and_colors : string -> t -> (char*color) list
 
+type node = {
+  letter : char;
+  position : int;
+}
+
+val is_valid_word2 : string -> t -> node list
+
 
 
 
