@@ -116,7 +116,7 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
   let () = Random.self_init () in 
   if is_game_over time
   then 
-    end_game game_number st
+    end_game game_number st found_wrds
   else begin
     try 
       print_string "\n"; 
@@ -127,21 +127,20 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
       (*|Quit -> print_string "hi"; end_game game_number st*)
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
         playing_game time st found_wrds game_number
-      |Quit -> end_game game_number st 
+      |Quit -> end_game game_number st found_wrds
       |Leaderboard -> print_leaderboard (leaderboard st); 
         playing_game time st found_wrds game_number
       |Hint -> failwith "unimplemented"
-      |Help -> print_string "\nTo enter a word, enter that word.
-                                                             To see your current score, enter #score.
-                                                                                                 To quit/restart game, enter #quit.
-                                                                                                                                For a hint, enter #hint.
-                                                                                                                                                     To see the leaderboard, enter #leaderboard.
-                                                                                                                                                                                      To see your leaderboard, enter #leaderboard.
-                                                                                                                                                                                                                        To see instructions, enter #help.";
+      |Help -> print_string "\nTo play a word, enter that word.\
+                             To see your current score, enter #score.\
+                             \nTo quit/restart game, enter #quit.\
+                             For a hint, enter #hint.\
+                             To see the leaderboard, enter #leaderboard.\
+                             To see instructions, enter #help.";
         playing_game time st found_wrds game_number
       |Entry (guess) -> 
         ignore(clear 0);
-        if is_game_over time then end_game game_number st 
+        if is_game_over time then end_game game_number st found_wrds
         else if List.mem guess found_wrds then playing_game time st found_wrds 
             game_number
         else if not (Board.is_valid_word guess (State.board st)) 
@@ -163,17 +162,34 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
   end 
 
 (** [end_game] ends the game.  *)
-and end_game game_number st =
+and end_game game_number st wrds=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
+  print_string ("\nWords found.\n");
+  print_list wrds;
+
+  print_string ("\nWords missed.\n");
+  print_list (unfound wrds (Board.get_possible_words (State.board st)) []);
+
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
   let () = print_leaderboard new_leaderboard in 
   (prompt_end game_number (new_leaderboard) ())
 
-
+and print_list lst =
+  match lst with
+  |[]-> ()
+  |h::t-> if t = [] then (print_string (h); print_list t)
+    else print_string (h ^ ", "); print_list t
 (** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
+
+and unfound found total acc=
+  match total with
+  |[]->acc
+  |h::t-> if List.mem h found then unfound found t acc
+    else unfound found t (h::acc)
+
 and prompt_end game_number leaderboard () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
@@ -200,14 +216,14 @@ let format_color (board:Board.t) (size:size) (word:string) : unit =
   let node_color_lst = nodes_and_colors word board in
   let rec helper lst () i =
     let n = (i mod size) in 
-      match lst with 
-      | [] -> ()
-      | (letter, color)::t -> match color with 
-        | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) 
+    match lst with 
+    | [] -> ()
+    | (letter, color)::t -> match color with 
+      | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) 
         else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) 
-        | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) 
+      | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) 
         else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) 
-        | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
+      | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
         else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) 
   in helper node_color_lst () 1
 
