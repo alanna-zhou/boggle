@@ -196,7 +196,22 @@ let word_blitz_art () =
   print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd            BB   BB      ll     ii      tt       zz\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd            BBBBBB        ll   iiii      ttt    zzzzzz\n"
 
-
+let format_color (board:Board.t) (size:size) (word:string) : unit =
+  failwith "Unimplemented"
+  (* let node_color_lst = nodes_and_colors word board in
+  let rec helper lst () i =
+    let n = i mod size in 
+      match lst with 
+      | [] -> ()
+      | (letter, color)::t -> match color with 
+        | Green -> if n = 0 then 
+            helper t (ANSITerminal.(print_char [green] letter; print_string " "; print_string "n")) (i+1) 
+            else helper t (ANSITerminal.(print_char [green] letter; print_string " ")) (i+1) 
+        | Red -> if n = 0 then helper t (ANSITerminal.(print_char [red] letter; print_string " "; print_string "n")) (i+1)  
+            else helper t (ANSITerminal.(print_char [red] letter; print_string " ")) (i+1) 
+        | Black ->if n = 0 then helper t (ANSITerminal.(print_char [black] letter; print_string " "; print_string "n")) (i+1) 
+            else helper t (ANSITerminal.(print_char [black] letter; print_string " ")) (i+1) 
+  in helper node_color_lst () 1 *)
 
 let main () =
   ignore (clear 0);
