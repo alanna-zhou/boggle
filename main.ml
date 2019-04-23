@@ -114,9 +114,23 @@ and is_game_over time =
   Unix.time () >= time
 
 
+let word_blitz_art () =
+  print_string "WW               WW                                   dd            BBBBBB      lll             tt\n";
+  print_string "WW               WW                                   dd            BB   BB      ll           tttttt\n";
+  print_string " WW             WW                                    dd            BB   BB      ll     ii      tt\n";
+  print_string " WW      W      WW      ooooo      rr rrr       ddddd dd            BBBBBB       ll             tt      zzzzzz\n";
+  print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd            BB   BB      ll    iii      tt         zz\n";
+  print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd            BB   BB      ll     ii      tt        zz\n";
+  print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd            BB   BB      ll     ii      tt       zz\n";
+  print_string "    WWW     WWW         ooooo      rr           ddddd dd            BBBBBB        ll   iiii      ttt    zzzzzz\n"
+
+
+
 let main () =
   ignore (clear 0);
-  print_string "Welcome to Word Blitz! Form and enter words contained on the
+  print_string "Welcome to\n";
+  word_blitz_art ();
+  print_string "Form and enter words contained on the
 board by connecting letters horizontally, vertically, or diagonally.
 At any time, type #help for gameplay instructions. \n";
   prompt_board_type ()
