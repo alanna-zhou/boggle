@@ -12,10 +12,17 @@ let board3 = testing_board3 ()
 let empty_board = generate (Random 0)
 
 
-let state_0 = init board
+let state_0 = init board []
 let state_1 = update state_0 "i"
 let state_2 = update state_1 "tip"
 let state_3 = update state_2 "rat"
+
+let leaderboard_new = [(4, [10; 20]); (5, [8])]
+let next_state = init board leaderboard_new 
+let next_state_2 = update next_state "hi"
+let next_leaderboard = add_leaderboard (leaderboard next_state_2) [50] 5 []
+
+
 
 let cmp_set_like_lists lst1 lst2 =
   let uniq1 = List.sort_uniq compare lst1 in
