@@ -455,18 +455,11 @@ let rec validate_node2 (node:node) (index:int) (board:t) (str:string)
       | h::t -> begin
           if (List.mem h new_visited_pos = false) then begin
             let node = get_node h board in 
-            try (
-              let result = validate_node2 h 0 board upper_word [] [h] in 
-              if ((List.length result) - 1) = String.length word 
-              then process_nlist t result 
-              else process_nlist t acc 
-            ) with
-              | Failure _ -> process_nlist t acc 
-            (* let result = validate_node2 node (index+1) board str new_visited_pos acc in 
+            let result = validate_node2 node (index+1) board str new_visited_pos acc in 
             match result with 
             | exception _ -> process_nlist t acc 
             | [] -> []
-            | _ -> process_nlist t result  *)
+            | _ -> process_nlist t result 
           end else process_nlist t acc
         end 
     in process_nlist possible_neighbors (node::node_lst)
