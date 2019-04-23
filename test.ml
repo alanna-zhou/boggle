@@ -129,42 +129,12 @@ let bfs_tests = [
   " B A
     D E board BFS" >:: (fun _ -> assert_equal (true)
                            (cmp_set_like_lists (get_possible_words board2) 
-                              ["bade"; "bad"; "ba"; "bead"; "bea"; "beda"; 
-                               "bed"; "be"; "b"; "abd"; "abed";
-                               "abe"; "ab"; "ade"; "ad"; "ae"; "a"; "dea"; 
-                               "deba"; "deb"; "de"; "dab"; "dae";
-                               "da"; "d"; "ea"; "ed"; "eb"; "e"] ));
+                              ["deb"; "dab"; "bade"; "bad"; "ba"; "bead"; "bed"; "be"; "abed"; "abe"; "ad";"a"; "ed"] ));
   " B A T
     D E L
     S N E board BFS" >:: (fun _ -> assert_equal (true)
                              (cmp_set_like_lists (get_possible_words board3) 
-                                ["bates"; "bated"; "bate"; "bat"; "bales"; 
-                                 "bale"; "bal"; "bade"; "bad"; "ba"; "beat"; 
-                                 "beads"; "bead"; "bea"; "bes"; "belt"; "belat";
-                                 "bela"; "bele"; "bel"; "beds"; "beda"; "bed"; 
-                                 "beel"; "been"; "bee"; "beta"; "bet"; "bends"; 
-                                 "bend"; "bene"; "ben"; "be"; "b"; "ae"; "abd"; 
-                                 "abel"; "abed"; "abet"; "abe"; "ab"; "ate"; 
-                                 "at"; "alte"; "ales"; "ale"; "al"; "adel"; 
-                                 "aden"; "ade"; "ad"; "a"; "tabe"; "tab";
-                                 "taleb"; "tales"; "talen"; "tale"; "tal"; 
-                                 "tad"; "ta"; "teal";"tea"; "tele"; "tel"; 
-                                 "ted"; "teens"; "teen"; "tee"; "tends"; 
-                                 "tend"; "tene"; "tens"; "ten"; "te"; "t"; "dealt"; "deale"; "deal"; "dea"; "deba"; "deb"; "des"; "delta"; "dela"; "dele"; "del"; "dee";"det"; "dens"; "den"; "de"; "dn"; "dae"; "dab"; "dates"; "datel"; "date"; "dat"; "dales"; "dale"; "dal"; "da"; "d"; "labe"; "lab"; "lates"; "latene"; "laten"; "late"; "lat"; "lads"; "laden"; "lade"; "lad"; "la"; "leads"; "lead"; "lea"; "leb"; "les"; "led";
-                                 "let"; "lends"; "lende"; "lend"; "lens"; "len";
-                                 "lees"; "leeds"; "leed";
-                                 "lee"; "le"; "l"; "sn"; "seab"; "seat"; 
-                                 "seale"; "seal"; "sea"; "seb"; "sele";
-                                 "sel"; "sed"; "seen"; "see"; "set"; "send"; 
-                                 "sene"; "sen"; "se"; "s"; "neat";
-                                 "nea"; "neb"; "nes"; "net"; "nel"; "needs";
-                                 "need"; "nee"; "ne"; "n"; "eat";
-                                 "ea"; "eb"; "es"; "ed"; "eta"; "et"; "ele"; 
-                                 "elates"; "elated"; "elate";
-                                 "elab"; "ela"; "el"; "ene"; "ends"; "endea"; 
-                                 "ende"; "enda"; "end"; "ens";
-                                 "enl"; "en"; "eel"; "ee"; "e"]));
-  (* missing seat and dealt *)
+                                ["delta"; "dealt"; "deal"; "deb"; "dens"; "den"; "dates"; "date"; "dab"; "dales"; "dale"; "dal"; "late"; "lab"; "lads"; "laden"; "lade"; "lad"; "leads"; "lead"; "lea"; "led"; "let"; "lends"; "lend"; "lens"; "len"; "leeds"; "lees"; "lee"; "bales"; "bale"; "bates"; "bated"; "bate"; "bat"; "bade"; "bad"; "ba"; "beat"; "beads"; "bead"; "belt"; "beds"; "bed"; "been"; "bee"; "beta"; "bet"; "bends"; "bend"; "ben"; "be"; "abel"; "abed"; "abet"; "abe"; "ate"; "at"; "ales"; "ale"; "al"; "aden"; "ad"; "a"; "tales"; "tale"; "tab"; "ta"; "teal"; "tea"; "tele"; "tel"; "ted"; "teens"; "teen"; "tee"; "tends"; "tend"; "tens"; "ten"; "te"; "elates"; "elated"; "elate"; "eat"; "eta"; "ene"; "ends"; "end"; "ens"; "eel"; "ed"; "send"; "seat"; "seal"; "sea"; "seen"; "see"; "set"; "se"; "neat"; "net"; "needs"; "need"; "nee"; "ne"]));
 ]
 
 let suite = "test suite for A6" >::: List.flatten [

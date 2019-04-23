@@ -6,6 +6,8 @@ type node = {
 }
 type size = int
 
+type color = Red | Green | Black
+
 type filename = string 
 
 exception InvalidSize of size 
@@ -415,6 +417,8 @@ let testing_board2 () =
   let b = {nodes=node_list; words=Trie.empty} in
   populate_board b
 
+let nodes_and_colors (word:string) (board:t) : int*color = 
+  (1, Black)
 
 let node0 = {letter='B'; position=0}
 let node1 = {letter='A'; position=1}
