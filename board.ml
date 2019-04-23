@@ -271,16 +271,16 @@ let generate (board_type:board_type) : t =
   let () = Random.self_init () in 
   match board_type with 
   | Standard size -> if size = 4 then begin 
-      generate_standard (create_die_arr "4x4.txt" 4) 4
+      populate_board (generate_standard (create_die_arr "4x4.txt" 4) 4)
     end else if size = 5 then begin
-      generate_standard (create_die_arr "5x5.txt" 5) 5
+      populate_board (generate_standard (create_die_arr "5x5.txt" 5) 5)
     end else raise (InvalidSize size)
-  | Random size -> (generate_random size)
+  | Random size -> populate_board ((generate_random size))
   | Custom_die(file, size) -> if size >= 4 && size <= 20 then begin
-      generate_standard (create_die_arr file size) size 
+      populate_board (generate_standard (create_die_arr file size) size) 
     end else raise (InvalidSize size)
   | Custom_board(file, size) -> if size >=4 && size <=20 then begin 
-      generate_custom file (size) end else raise(InvalidSize size)
+      populate_board (generate_custom file (size)) end else raise(InvalidSize size)
 
 (** [get_node_letter l lst acc] filters the node list [lst] and returns a
     only the nodes containing letter [l]. *)
@@ -476,22 +476,22 @@ let is_valid_word2 (word:string) (board:t) : node list =
     match lst with
     | [] -> []
     | h :: t -> begin 
-      let result = validate_node2 h 0 board upper_word [] [h] in 
-      if ((List.length result) - 1) = String.length word then result else 
-      node_loop t
-    end 
+        let result = validate_node2 h 0 board upper_word [] [h] in 
+        if ((List.length result) - 1) = String.length word then result else 
+          node_loop t
+      end 
   in match (List.rev (node_loop nodes_fst_letter)) with 
   | [] -> []
   | h::t -> t
 
-  let nodes_and_colors (word:string) (board:t) : (char*color) list = 
-    let helper = 
-      let nodes_of_word = is_valid_word2 word board in 
-      if (List.length nodes_of_word > 0) then 
-        if Trie.contains english_words word then 
-          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, White)::acc) ) [] board.nodes
-        else 
-          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+let nodes_and_colors (word:string) (board:t) : (char*color) list = 
+  let helper = 
+    let nodes_of_word = is_valid_word2 word board in 
+    if (List.length nodes_of_word > 0) then 
+      if Trie.contains english_words word then 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, White)::acc) ) [] board.nodes
       else 
-        List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
-    in List.rev helper 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+    else 
+      List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
+  in List.rev helper 
