@@ -6,6 +6,8 @@ type node = {
 }
 type size = int
 
+type color = Red | Green | Black
+
 type filename = string 
 
 exception InvalidSize of size 
@@ -274,11 +276,11 @@ let generate (board_type:board_type) : t =
       generate_standard (create_die_arr "5x5.txt" 5) 5
     end else raise (InvalidSize size)
   | Random size -> (generate_random size)
-  | Custom_die(file, size) -> if size <= 30 then begin
+  | Custom_die(file, size) -> if size >= 4 && size <= 20 then begin
       generate_standard (create_die_arr file size) size 
     end else raise (InvalidSize size)
-  | Custom_board(file, size) -> if size <=30 then begin 
-      generate_custom file size end else raise(InvalidSize size)
+  | Custom_board(file, size) -> if size >=4 && size <=20 then begin 
+      generate_custom file (size) end else raise(InvalidSize size)
 
 (** [get_node_letter l lst acc] filters the node list [lst] and returns a
     only the nodes containing letter [l]. *)
@@ -415,6 +417,8 @@ let testing_board2 () =
   let b = {nodes=node_list; words=Trie.empty} in
   populate_board b
 
+let nodes_and_colors (word:string) (board:t) : int*color = 
+  (1, Black)
 
 let node0 = {letter='B'; position=0}
 let node1 = {letter='A'; position=1}

@@ -12,6 +12,8 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
+type color = Red | Green | Black
+
 (** The file name of file with required data. *)
 type filename = string 
 
@@ -113,6 +115,8 @@ val testing_board2: unit -> t
     Raises: No Exceptions
     Example: [testing_board1 ()] returns a board.*)
 val testing_board3: unit -> t
+
+val nodes_and_colors : string -> t -> int*color 
 
 
 

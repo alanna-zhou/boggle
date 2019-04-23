@@ -11,30 +11,6 @@ let rec make_list lst acc=
   |[]-> acc
   |h::t-> make_list t (h ^ "; " ^ acc)
 
-(** [start_game] starts the game and allows for user input.  *)
-(*let rec start_game game_number leaderboard () =
-  print_endline "\nWhat kind of board would you like?";
-  print_string  "\nType s for Standard and r for Random. : "; 
-  if game_number = 0 then begin 
-    match  read_line () with
-    |"s" -> playing_game (Unix.time() +. 90.) 
-              (State.init (Board.generate (Standard (4))) []) [] game_number
-    |"r" -> playing_game (Unix.time() +. 90.) 
-              (State.init (Board.generate (Random(4))) [])  [] game_number
-    |_-> print_endline "\nInvalid entry"; start_game game_number leaderboard ()
-  end else begin 
-    match read_line () with 
-    |"s" -> playing_game (Unix.time() +. 90.) 
-              (State.init (Board.generate (Standard (4))) leaderboard) [] game_number
-    |"r" -> playing_game (Unix.time() +. 90.) 
-              (State.init (Board.generate (Random(4))) leaderboard) [] game_number
-    |_-> print_endline "\nInvalid entry"; start_game game_number leaderboard ()
-  end
-  and playing_game time st found_wrds game_number =
-  if is_game_over time then 
-    end_game game_number st 
-  else begin 
-    =======*)
 let rec prompt_board_size () =
   try 
     let size = int_of_string (read_line()) in size
@@ -42,38 +18,99 @@ let rec prompt_board_size () =
   |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
     prompt_board_size ()
 
-and prompt_board_type (game_number: int) (leaderboard: (int * int list) list) ()  =
+let rec prompt_board_file () =
+  try 
+    let file = read_line() in file
+  with 
+  |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
+    prompt_board_file ()
+
+and prompt_board_type game_number leaderboard () =
   print_endline "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
-  |"s" -> print_string "\nWould you like the board to be a 4x4 or 5x5? ";
-    let s = prompt_board_size () in 
-    if s =4 || s = 5 then
-      playing_game (Unix.time() +. 90.) 
-        (State.init (Board.generate (Standard (s))) 
-           (if game_number = 0 then [] else leaderboard)) []
-        game_number
-    else ANSITerminal.(print_string [red] "\nInvalid entry";
-                       prompt_board_type game_number leaderboard ());
-
+  |"s" -> begin 
+      print_string "\nDo you want to create a board with customized die or use\
+                    built in standard boards? Type b for builtin, and cd for \
+                    custom die. ";
+      match read_line () with 
+      |"b" -> begin
+          print_string "\nWould you like the board to be a 4x4 or 5x5? ";
+          let s = prompt_board_size () in 
+          if s =4 || s = 5 then
+            playing_game (Unix.time() +. 90.) 
+              (State.init (Board.generate (Standard (s))) 
+                 (if game_number = 0 then [] else leaderboard)) []
+              game_number
+          else ANSITerminal.(print_string [red] "\nInvalid entry";
+                             prompt_board_type game_number leaderboard ()); 
+        end
+      |"cd"-> begin 
+          try 
+            print_string "\nWhat size board does this custom die correspond to? \
+                          Entry must be less than 20 and greater than 4. ";
+            (let s = prompt_board_size () in 
+             print_string "\nEnter the file name of your custom die: ";
+             let f = prompt_board_file() in
+             playing_game (Unix.time() +. 90.) 
+               (State.init (Board.generate (Custom_die(f, s))) 
+                  (if game_number = 0 then [] else leaderboard)) []
+               game_number)
+          with 
+          |InvalidFile x -> ANSITerminal.(print_string [red] 
+                                            (x ^ " is not a valid file name"));
+            prompt_board_type game_number leaderboard ()
+          |InvalidSize s -> ANSITerminal.
+                              (print_string [red] ((string_of_int s) ^ 
+                                                   " is not an allowed \
+                                                    size, or the file \
+                                                    does not correspond to \
+                                                    the inputted size. "));
+            prompt_board_type game_number leaderboard ()
+        end
+      |_ -> ANSITerminal.(print_string [red] "\nInvalid entry"; 
+                          prompt_board_type game_number leaderboard ());
+    end
   |"r" -> print_string "\nWhat size board would you like? For example, \
-                        entering 10 will create a 10x10 board. Entry must be less than 30. ";
+                        entering 10 will create a 10x10 board. Entry must be\
+                        less than 20. ";
     let s = prompt_board_size () in 
-    if s < 31 && s > 5
+    if s < 21 && s > 6
     then playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Random(s))) 
            (if game_number = 0 then [] else leaderboard)) []
         game_number
-    else print_string "\nRandom size must be greater than or equal to 6, and 
-        less than or equal to 30."; prompt_board_type game_number leaderboard ()
+    else ANSITerminal.(print_string [red] "\nRandom size must be greater than \
+                                           or equal to 6, and less than or \
+                                           equal to 20."; 
+                       prompt_board_type game_number leaderboard ());
 
-  |"c" ->     let s = prompt_board_size () in 
-    playing_game (Unix.time() +. 90.) 
-      (State.init (Board.generate (Random(s))) 
-         (if game_number = 0 then [] else leaderboard)) []
-      game_number
+  |"c" -> begin 
+      try 
+        print_string "\nWhat size board are you uploading? Entry must be less \
+                      than 20 and greater than 4. ";
+        (let s = prompt_board_size () in 
+         print_string "\nEnter the file name of your custom board: " ;
+         let f = prompt_board_file() in
+         playing_game (Unix.time() +. 90.) 
+           (State.init (Board.generate (Custom_board(f, s))) 
+              (if game_number = 0 then [] else leaderboard)) []
+           game_number)
+      with 
+      |InvalidFile x -> ANSITerminal.(print_string [red]
+                                        (x ^ " is not a valid file name"));
+        prompt_board_type game_number leaderboard ()
+      |InvalidSize s -> ANSITerminal.
+                          (print_string [red] ((string_of_int s)
+                                               ^ " is not of the allowed \
+                                                  size, or the file does not \
+                                                  correspond to the inputted \
+                                                  size. "));
+        prompt_board_type game_number leaderboard ()
+    end
   |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; 
                      prompt_board_type game_number leaderboard ());
+
 
 and playing_game time (st: State.t) (found_wrds: string list) game_number =
   let () = Random.self_init () in 
@@ -95,11 +132,12 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
         playing_game time st found_wrds game_number
       |Hint -> failwith "unimplemented"
       |Help -> print_string "\nTo enter a word, enter that word.
-To see your current score, enter #score.
-To quit/restart game, enter #quit.
-For a hint, enter #hint.
-To see your leaderboard, enter #leaderboard.
-To see instructions, enter #help.";
+                                                             To see your current score, enter #score.
+                                                                                                 To quit/restart game, enter #quit.
+                                                                                                                                For a hint, enter #hint.
+                                                                                                                                                     To see the leaderboard, enter #leaderboard.
+                                                                                                                                                                                      To see your leaderboard, enter #leaderboard.
+                                                                                                                                                                                                                        To see instructions, enter #help.";
         playing_game time st found_wrds game_number
       |Entry (guess) -> 
         ignore(clear 0);
@@ -113,10 +151,14 @@ To see instructions, enter #help.";
           playing_game time (new_state) (guess :: found_wrds) game_number
         end
     with 
-    |Failure x -> print_endline (x ^ " is not a valid input."); 
+    | Failure x -> ignore(clear 0);
+      ANSITerminal.(print_string [red] (x));
+      print_string (" is not a valid input."); 
+      playing_game time st found_wrds game_number 
+    |Empty -> ignore(clear 0); 
+      ANSITerminal.(print_string [red] "\nEntry is empty, choose another word.");
       playing_game time st found_wrds game_number
-    |Empty -> print_string "\nEntry is empty, choose another word.";
-      playing_game time st found_wrds game_number
+
 
   end 
 
@@ -148,16 +190,12 @@ let main () =
   ignore (clear 0);
   print_string "Welcome to Word Blitz! Form and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
-                diagonally. You cannot use a board element more than once to \
-                form a word. Play with your desired board dimensions, and \
-                configure a board the way you like. Enter #hint to see a hint,\
-                but do know that you have a maximum of 3 hints per game \
-                and it can lead to a score deduction. At any time, type #help \
-                for gameplay instructions. ";
+                diagonally.  At any time, type #help for gameplay instructions.\
+                You can choose a board of your desired size, and configure a \
+                board the way you want. You cannot use a board element more \
+                than once on the board. Type #hint for a hint, but do know \
+                that you have a maximum of 3 hints - each hint will lead to a \
+                small score deduction. \n";
   prompt_board_type 0 [] ()
 
-let () = main()
-
-(*prompt_board_type should take game number and leaderboard*)
-
-
+let () = main ()
