@@ -6,7 +6,7 @@ type node = {
 }
 type size = int
 
-type color = Red | Green | Black
+type color = Red | Green | White
 
 type filename = string 
 
@@ -468,31 +468,29 @@ let rec validate_node2 (node:node) (index:int) (board:t) (str:string)
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word2 (word:string) (board:t) : node list = 
-  if Trie.contains english_words (String.lowercase_ascii word) then begin 
-    let upper_word = String.uppercase_ascii word in
-    let first_char = upper_word.[0] in 
-    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
-    let rec node_loop lst = 
-      match lst with
-      | [] -> []
-      | h :: t -> begin 
-        let result = validate_node2 h 0 board upper_word [] [h] in 
-        if ((List.length result) - 1) = String.length word then result else 
-        node_loop t
-      end 
-    in match (List.rev (node_loop nodes_fst_letter)) with 
+  let upper_word = String.uppercase_ascii word in
+  let first_char = upper_word.[0] in 
+  let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+  let rec node_loop lst = 
+    match lst with
     | [] -> []
-    | h::t -> t
-  end else []
+    | h :: t -> begin 
+      let result = validate_node2 h 0 board upper_word [] [h] in 
+      if ((List.length result) - 1) = String.length word then result else 
+      node_loop t
+    end 
+  in match (List.rev (node_loop nodes_fst_letter)) with 
+  | [] -> []
+  | h::t -> t
 
   let nodes_and_colors (word:string) (board:t) : (char*color) list = 
     let helper = 
       let nodes_of_word = is_valid_word2 word board in 
       if (List.length nodes_of_word > 0) then 
         if Trie.contains english_words word then 
-          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, Black)::acc) ) [] board.nodes
+          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, White)::acc) ) [] board.nodes
         else 
-          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, Black)::acc) ) [] board.nodes
+          List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, White)::acc) ) [] board.nodes
       else 
-        List.fold_left (fun acc node -> (node.letter, Black)::acc) [] board.nodes
+        List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
     in List.rev helper 

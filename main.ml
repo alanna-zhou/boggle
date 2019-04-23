@@ -207,7 +207,7 @@ let format_color (board:Board.t) (size:size) (word:string) : unit =
         else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) 
         | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) 
         else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) 
-        | Black -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
+        | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
         else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) 
   in helper node_color_lst () 1
 

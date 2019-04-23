@@ -40,3 +40,12 @@ Trie.to_list p;;
 let b = generate_random 3;;
 let p = populate_board b;;
 Trie.to_list p.words;;
+
+#use "board.ml";;
+let b = testing_board3 ();;
+is_valid_word2 "dealt" b;;
+is_valid_word2 "need" b;;
+
+#use "main.ml";;
+let b = testing_board3 ();;
+format_color b 3 "bds";;

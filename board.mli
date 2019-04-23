@@ -12,7 +12,7 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
-type color = Red | Green | Black
+type color = Red | Green | White
 
 (** The file name of file with required data. *)
 type filename = string 
