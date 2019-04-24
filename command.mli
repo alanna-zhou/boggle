@@ -4,6 +4,7 @@ type command =
   |Score 
   |Help
   |Hint
+  |Leaderboard
   |Entry of string
 
 (** Raised when an empty command is parsed *)

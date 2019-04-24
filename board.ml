@@ -1,4 +1,4 @@
-open Trie 
+open Trie
 
 type node = {
   letter : char;
@@ -6,7 +6,7 @@ type node = {
 }
 type size = int
 
-type color = Red | Green | Black
+type color = Red | Green | White
 
 type filename = string 
 
@@ -271,16 +271,16 @@ let generate (board_type:board_type) : t =
   let () = Random.self_init () in 
   match board_type with 
   | Standard size -> if size = 4 then begin 
-      generate_standard (create_die_arr "4x4.txt" 4) 4
+      populate_board (generate_standard (create_die_arr "4x4.txt" 4) 4)
     end else if size = 5 then begin
-      generate_standard (create_die_arr "5x5.txt" 5) 5
+      populate_board (generate_standard (create_die_arr "5x5.txt" 5) 5)
     end else raise (InvalidSize size)
-  | Random size -> (generate_random size)
-  | Custom_die(file, size) -> if size <= 30 then begin
-      generate_standard (create_die_arr file size) size 
+  | Random size -> populate_board ((generate_random size))
+  | Custom_die(file, size) -> if size >= 4 && size <= 20 then begin
+      populate_board (generate_standard (create_die_arr file size) size) 
     end else raise (InvalidSize size)
-  | Custom_board(file, size) -> if size <=30 then begin 
-      generate_custom file size end else raise(InvalidSize size)
+  | Custom_board(file, size) -> if size >=4 && size <=20 then begin 
+      populate_board (generate_custom file (size)) end else raise(InvalidSize size)
 
 (** [get_node_letter l lst acc] filters the node list [lst] and returns a
     only the nodes containing letter [l]. *)
@@ -364,29 +364,46 @@ let rec hborder size =
   |n -> print_string"-"; hborder (size-1)
 
 (*helps format. Does middle of board*)
-let rec mid_board board size=
+let rec mid_board board size left=
   match board.nodes with
   | [] -> ()
-  | h::t -> begin
-      if t = [] then
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+  | h::t -> begin 
+      if left = 1 then 
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                ANSITerminal.(print_string [Underlined] (Char.escaped h.letter)); print_string "|\n"
+              end else 
+                ANSITerminal.(print_string [Underlined] ((Char.escaped h.letter) ^ " ")) in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
       else
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n|")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
     end
-
 (** [format] formats the board in string form.  *)
 let rec format board size = 
   hborder (2*size+2);
   print_string "\n|";
-  mid_board board size;
+  mid_board board size size;
   hborder (2*size+2)
 
 (** Used to help test *)
@@ -417,9 +434,6 @@ let testing_board2 () =
   let b = {nodes=node_list; words=Trie.empty} in
   populate_board b
 
-let nodes_and_colors (word:string) (board:t) : int*color = 
-  (1, Black)
-
 let node0 = {letter='B'; position=0}
 let node1 = {letter='A'; position=1}
 let node2 = {letter='T'; position=2}
@@ -438,3 +452,63 @@ let testing_board3 () =
 let board3 = testing_board3 ()
 
 
+
+(** [validate_node node idx b str] does a depth first search for word [str] 
+    in board [b], starting from node [node]. Returns true if [str] was found
+    looking horizontally, vertically, and diagonally searching from the starting
+    point, and returns false if not. *)
+let rec validate_node2 (node:node) (index:int) (board:t) (str:string) 
+    (visited_pos:int list) (node_lst:node list): node list = 
+  let new_visited_pos = (node.position::visited_pos) in 
+  if index = String.length str - 1 then 
+    if List.length node_lst <> String.length str then [] else (node::node_lst)
+  else begin
+    let next_letter = str.[index + 1] in
+    let neighbor_positions = positions_of_neighbors node board in 
+    let possible_neighbors = List.filter 
+        (fun x -> (get_node x board).letter = next_letter) neighbor_positions in
+    let rec process_nlist neighbor_lst acc = match neighbor_lst with
+      | [] -> acc
+      | h::t -> begin
+          if (List.mem h new_visited_pos = false) then begin
+            let node = get_node h board in 
+            let result = validate_node2 node (index+1) board str new_visited_pos acc in 
+            match result with 
+            | [] -> []
+            | _ -> result
+          end else process_nlist t acc
+        end 
+    in process_nlist possible_neighbors (node::node_lst)
+  end
+
+(** [is_valid_word w b] returns true if [w] is contained in the english
+    dictionary and could be formed following the rules on board [b], and false
+    otherwise. *)
+let is_valid_word2 (word:string) (board:t) : node list = 
+  if String.length word = 0 then [] else 
+  let upper_word = String.uppercase_ascii word in
+  let first_char = upper_word.[0] in 
+  let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+  let rec node_loop lst = 
+    match lst with
+    | [] -> []
+    | h :: t -> begin 
+        let result = validate_node2 h 0 board upper_word [] [h] in 
+        if ((List.length result) - 1) = String.length word then result else 
+          node_loop t
+      end 
+  in match (List.rev (node_loop nodes_fst_letter)) with 
+  | [] -> []
+  | h::t -> t
+
+let nodes_and_colors (word:string) (board:t) : (char*color) list = 
+  let helper = 
+    let nodes_of_word = is_valid_word2 word board in 
+    if (List.length nodes_of_word > 0) then 
+      if Trie.contains english_words word then 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+      else 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+    else 
+      List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
+  in List.rev helper 
