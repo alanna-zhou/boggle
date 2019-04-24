@@ -33,21 +33,45 @@ let format_color (board:Board.t) (size:size) (word:string): unit =
     | (letter, color)::t -> 
       if left=1 then
         begin match color with 
-          | Green ->if n<> 0 then helper t (ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
-            else ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter)))
-          | Red -> if n<> 0 then helper t (ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
-            else ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter)))
-          | White ->if n<> 0 then helper t (ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
-            else ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter)))
+          | Green ->if n<> 0 then helper t 
+                (ANSITerminal.(print_string [green; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [green; Underlined] 
+                                 ((Char.escaped letter)))
+          | Red -> if n<> 0 then helper t 
+                (ANSITerminal.(print_string [red; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [red; Underlined] 
+                                 ((Char.escaped letter)))
+          | White ->if n<> 0 then helper t 
+                (ANSITerminal.(print_string [white; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [white; Underlined]
+                                 ((Char.escaped letter)))
         end
       else
         begin match color with 
-          | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] ((Char.escaped letter)^ " "))) (i+1) (left)
-            else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
-          | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] ((Char.escaped letter)^ " "))) (i+1) (left)
-            else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
-          | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] ((Char.escaped letter)^ " "))) (i+1) (left)
-            else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
+          | Green -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [green] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [green] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
+          | Red -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [red] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [red] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
+          | White -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [white] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [white] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
         end
 
   in (helper node_color_lst () 1 size);
@@ -66,8 +90,8 @@ and prompt_board_type game_number leaderboard () =
   match  read_line () with
   |"s" -> begin 
       print_string "\nDo you want to create a board with customized die or use\
-                    built in standard boards? \nType b for built-in, and cd for \
-                    custom die. ";
+                    built in standard boards? \nType b for built-in, and cd \
+                    for custom die. ";
       match read_line () with 
       |"b" -> begin
           print_string "\nWould you like the board to be a 4x4 or 5x5? ";
@@ -82,8 +106,8 @@ and prompt_board_type game_number leaderboard () =
         end
       |"cd"-> begin 
           try 
-            print_string "\nWhat size board does this custom die correspond to? \
-                          Entry must be less than 20 and greater than 4. ";
+            print_string "\nWhat size board does this custom die correspond \
+                          to? Entry must be less than 20 and greater than 4. ";
             (let s = prompt_board_size () in 
              print_string "\nEnter the file name of your custom die: ";
              let f = prompt_board_file() in
@@ -147,7 +171,8 @@ and prompt_board_type game_number leaderboard () =
                      prompt_board_type game_number leaderboard ());
 
 
-and playing_game time (st: State.t) (found_wrds: string list) game_number lguess=
+and playing_game time (st: State.t) (found_wrds: string list) game_number 
+    lguess=
   let () = Random.self_init () in 
   if is_game_over time
   then 
@@ -224,7 +249,8 @@ and end_game game_number st wrds time=
   print_green_list wrds;
 
   print_string ("\nWords missed:\n");
-  print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) []);
+  print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) 
+                       []);
   print_string ("\nAverage time between words: ");
   print_float 
     ((floor(
@@ -243,14 +269,18 @@ and end_game game_number st wrds time=
 and print_yellow_list lst =
   match lst with
   |[]-> ()
-  |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h); print_yellow_list t)
-    else (ANSITerminal.(print_string [yellow] (h ^ ", "))); print_yellow_list t
+  |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h);
+                          print_yellow_list t)
+    else (ANSITerminal.(print_string [yellow] (h ^ ", ")));
+    print_yellow_list t
 
 and print_green_list lst =
   match lst with
   |[]-> ()
-  |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); print_green_list t)
-    else (ANSITerminal.(print_string [green] (h ^ ", "))); print_green_list t
+  |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); 
+                          print_green_list t)
+    else (ANSITerminal.(print_string [green] (h ^ ", "))); 
+    print_green_list t
 
 and unfound found total acc=
   match total with
