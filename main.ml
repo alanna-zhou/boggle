@@ -18,6 +18,31 @@ let rec prompt_board_size () =
   |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
     prompt_board_size ()
 
+let format_color (board:Board.t) (size:size) (word:string): unit =
+  let node_color_lst = nodes_and_colors word board in
+  let rec helper lst () i left=
+    let n = (i mod size) in 
+    match lst with 
+    | [] -> ()
+    | (letter, color)::t -> 
+      (*if left=1 then
+        begin match color with 
+          | Green ->helper t (ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+          | Red -> helper t (ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+          | White ->helper t (ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+        end
+        else*)
+      begin match color with 
+        | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) (left)
+          else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) (left-1)
+        | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) (left)
+          else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) (left-1)
+        | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) (left)
+          else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) (left-1)
+      end
+
+  in helper node_color_lst () 1 size
+
 let rec prompt_board_file () =
   try 
     let file = read_line() in file
@@ -41,7 +66,7 @@ and prompt_board_type game_number leaderboard () =
             playing_game (Unix.time() +. 90.) 
               (State.init (Board.generate (Standard (s))) 
                  (if game_number = 0 then [] else leaderboard)) []
-              game_number
+              game_number ""
           else ANSITerminal.(print_string [red] "\nInvalid entry";
                              prompt_board_type game_number leaderboard ()); 
         end
@@ -55,7 +80,7 @@ and prompt_board_type game_number leaderboard () =
              playing_game (Unix.time() +. 90.) 
                (State.init (Board.generate (Custom_die(f, s))) 
                   (if game_number = 0 then [] else leaderboard)) []
-               game_number)
+               game_number "")
           with 
           |InvalidFile x -> ANSITerminal.(print_string [red] 
                                             (x ^ " is not a valid file name"));
@@ -79,7 +104,7 @@ and prompt_board_type game_number leaderboard () =
     then playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Random(s))) 
            (if game_number = 0 then [] else leaderboard)) []
-        game_number
+        game_number ""
     else ANSITerminal.(print_string [red] "\nRandom size must be greater than \
                                            or equal to 6, and less than or \
                                            equal to 20."; 
@@ -95,7 +120,7 @@ and prompt_board_type game_number leaderboard () =
          playing_game (Unix.time() +. 90.) 
            (State.init (Board.generate (Custom_board(f, s))) 
               (if game_number = 0 then [] else leaderboard)) []
-           game_number)
+           game_number "")
       with 
       |InvalidFile x -> ANSITerminal.(print_string [red]
                                         (x ^ " is not a valid file name"));
@@ -112,24 +137,24 @@ and prompt_board_type game_number leaderboard () =
                      prompt_board_type game_number leaderboard ());
 
 
-and playing_game time (st: State.t) (found_wrds: string list) game_number =
+and playing_game time (st: State.t) (found_wrds: string list) game_number lguess=
   let () = Random.self_init () in 
   if is_game_over time
   then 
-    end_game game_number st found_wrds
+    end_game game_number st found_wrds time
   else begin
     try 
       print_string "\n"; 
-      Board.format (State.board st) (Board.size (State.board st));
+      format_color (State.board st) (Board.size (State.board st)) (lguess);
       print_string ("\nWords found: " ^ 
                     (make_list found_wrds "") ^ "\nEnter a word: ");
       match (Command.parse(read_line ())) with
       (*|Quit -> print_string "hi"; end_game game_number st*)
       |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
-        playing_game time st found_wrds game_number
-      |Quit -> end_game game_number st found_wrds
+        playing_game time st found_wrds game_number ""
+      |Quit -> end_game game_number st found_wrds time
       |Leaderboard -> print_leaderboard (leaderboard st); 
-        playing_game time st found_wrds game_number
+        playing_game time st found_wrds game_number ""
       |Hint -> failwith "unimplemented"
       |Help -> print_string "\nTo play a word, enter that word.\
                              To see your current score, enter #score.\
@@ -137,32 +162,32 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number =
                              For a hint, enter #hint.\
                              To see the leaderboard, enter #leaderboard.\
                              To see instructions, enter #help.";
-        playing_game time st found_wrds game_number
+        playing_game time st found_wrds game_number ""
       |Entry (guess) -> 
         ignore(clear 0);
-        if is_game_over time then end_game game_number st found_wrds
+        if is_game_over time then end_game game_number st found_wrds time
         else if List.mem guess found_wrds then playing_game time st found_wrds 
-            game_number
+            game_number guess
         else if not (Board.is_valid_word guess (State.board st)) 
         then raise (Failure guess)
         else begin
           let new_state = State.update st guess in 
-          playing_game time (new_state) (guess :: found_wrds) game_number
+          playing_game time (new_state) (guess :: found_wrds) game_number guess
         end
     with 
     | Failure x -> ignore(clear 0);
       ANSITerminal.(print_string [red] (x));
       print_string (" is not a valid input."); 
-      playing_game time st found_wrds game_number 
+      playing_game time st found_wrds game_number ""
     |Empty -> ignore(clear 0); 
       ANSITerminal.(print_string [red] "\nEntry is empty, choose another word.");
-      playing_game time st found_wrds game_number
+      playing_game time st found_wrds game_number ""
 
 
   end 
 
 (** [end_game] ends the game.  *)
-and end_game game_number st wrds=
+and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
@@ -171,7 +196,9 @@ and end_game game_number st wrds=
 
   print_string ("\nWords missed.\n");
   print_list (unfound wrds (Board.get_possible_words (State.board st)) []);
-
+  print_string ("Average time between words: ");
+  print_float ((float (List.length wrds)) 
+               /. (min (90. -. (time-. Unix.time ())) 90. ));
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
   let () = print_leaderboard new_leaderboard in 
@@ -203,33 +230,30 @@ and is_game_over time =
 
 
 let word_blitz_art () =
-  print_string "WW               WW                                   dd            BBBBBB      lll             tt\n";
-  print_string "WW               WW                                   dd            BB   BB      ll           tttttt\n";
-  print_string " WW             WW                                    dd            BB   BB      ll     ii      tt\n";
-  print_string " WW      W      WW      ooooo      rr rrr       ddddd dd            BBBBBB       ll             tt      zzzzzz\n";
-  print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd            BB   BB      ll    iii      tt         zz\n";
-  print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd            BB   BB      ll     ii      tt        zz\n";
-  print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd            BB   BB      ll     ii      tt       zz\n";
-  print_string "    WWW     WWW         ooooo      rr           ddddd dd            BBBBBB        ll   iiii      ttt    zzzzzz\n"
+  print_string "WW               WW                                   dd      \
+               \          BBBBBB      lll             tt                 !!\n";
+  print_string "WW               WW                                   dd      \
+               \          BB   BB      ll           tttttt               !!\n";
+  print_string " WW             WW                                    dd      \
+               \          BB   BB      ll     ii      tt                 !!\n";
+  print_string " WW      W      WW      ooooo      rr rrr       ddddd dd      \
+               \          BBBBBB       ll             tt      zzzzzz     !!\n";
+  print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd      \
+               \          BB   BB      ll    iii      tt         zz      !!\n";
+  print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd      \
+               \          BB   BB      ll     ii      tt        zz         \n";
+  print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \
+               \          BB   BB      ll     ii      tt       zz        !!\n";
+  print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
+               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
 
-let format_color (board:Board.t) (size:size) (word:string) : unit =
-  let node_color_lst = nodes_and_colors word board in
-  let rec helper lst () i =
-    let n = (i mod size) in 
-    match lst with 
-    | [] -> ()
-    | (letter, color)::t -> match color with 
-      | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) 
-      | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) 
-      | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) 
-  in helper node_color_lst () 1
+
 
 let main () =
   ignore (clear 0);
-  print_string "Welcome to Word Blitz! Form and enter words contained on the \
+  print_string "Welcome to \n\n";
+  word_blitz_art ();
+  print_string "Form and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
                 diagonally.  At any time, type #help for gameplay instructions.\
                 You can choose a board of your desired size, and configure a \

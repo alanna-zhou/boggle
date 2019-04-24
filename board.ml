@@ -1,4 +1,4 @@
-open Trie 
+open Trie
 
 type node = {
   letter : char;
@@ -364,29 +364,46 @@ let rec hborder size =
   |n -> print_string"-"; hborder (size-1)
 
 (*helps format. Does middle of board*)
-let rec mid_board board size=
+let rec mid_board board size left=
   match board.nodes with
   | [] -> ()
-  | h::t -> begin
-      if t = [] then
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+  | h::t -> begin 
+      if left = 1 then 
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                ANSITerminal.(print_string [Underlined] (Char.escaped h.letter)); print_string "|\n"
+              end else 
+                ANSITerminal.(print_string [Underlined] ((Char.escaped h.letter) ^ " ")) in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
       else
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n|")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
     end
-
 (** [format] formats the board in string form.  *)
 let rec format board size = 
   hborder (2*size+2);
   print_string "\n|";
-  mid_board board size;
+  mid_board board size size;
   hborder (2*size+2)
 
 (** Used to help test *)
