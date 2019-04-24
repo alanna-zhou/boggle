@@ -131,13 +131,7 @@ val testing_board3: unit -> t
     @param board for the word to be searched on
     @return letter and color tuple list to help main know what letters to color
     Raises: No Exceptions
-<<<<<<< HEAD
     Example: [nodes_and_colors "bad" (testing_board3 ())] returns [('B', Green); ('A', Green); ('T', White); ('D', Green); ('E', White); ('L', White); ('S', White); ('N', White); ('E', White)]
-=======
-    Example: [nodes_and_colors "bad" (testing_board3 ())] returns [('B', Green);
-    ('A', Green); ('T', White); ('D', Green); ('E', White); ('L', White);
-     ('S', White); ('N', White); ('E', White)]
->>>>>>> 8166cfb00d5d0328533f7f4d17a6518eab431cf2
 *)
 val nodes_and_colors : string -> t -> (char*color) list
 
