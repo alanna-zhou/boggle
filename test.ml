@@ -161,7 +161,7 @@ let get_possible_words_tests = [
   " B A
     D E board BFS" >:: (fun _ -> assert_equal (true)
                            (cmp_set_like_lists (get_possible_words board2) 
-                              ["deb"; "dab"; "bade"; "bad"; "ba"; "bead"; "bed"; 
+                              ["deb"; "dab"; "bade"; "bad"; "ba"; "bead"; "bed";
                                "be"; "abed"; "abe"; "ad";"a"; "ed"] ));
   " B A T
     D E L
