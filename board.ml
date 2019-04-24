@@ -434,6 +434,67 @@ let testing_board3 () =
 
 let board3 = testing_board3 ()
 
+(** [validate_node2 node idx b str pos lst] does a depth first search for word
+    [str] in board [b], starting from node [node]. Returns the list of nodes 
+    through which word [str] is formed if word can be formed on board; 
+    if word cannot be formed, returns an empty list. The word can be formed 
+    looking horizontally, vertically, and diagonally searching from the starting
+    point. *)
+let rec validate_node2 (node:node) (index:int) (board:t) (str:string) 
+    (visited_pos:int list) (node_lst:node list): node list = 
+  let new_visited_pos = (node.position::visited_pos) in 
+  if index = (String.length str) - 1 then node_lst 
+  else begin
+    let next_letter = str.[index + 1] in 
+    let neighbor_positions = positions_of_neighbors node board in 
+    let possible_neighbors = List.filter 
+        (fun x -> (get_node x board).letter = next_letter) neighbor_positions in
+    let rec process_nlist neighbor_lst = match neighbor_lst with
+      | [] -> []
+      | h::t -> begin 
+          if (List.mem h new_visited_pos = false) then begin
+            let result = (validate_node2 (get_node h board) 
+                            (index + 1) board str new_visited_pos 
+                            ((get_node h board)::node_lst)) in 
+            if (List.length result  = index + 1) then result 
+            else if String.length str = List.length result then result
+            else process_nlist t 
+          end
+          else process_nlist t
+        end in (process_nlist possible_neighbors)
+  end
+
+(** [is_valid_word2 w b] returns the node list of letters used to form the word
+    [w] on board [b]. *)
+let is_valid_word2 (word:string) (board:t) : node list = 
+  if String.length word = 0 then [] else begin 
+    let upper_word = String.uppercase_ascii word in
+    let first_char = upper_word.[0] in 
+    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
+    let rec node_loop lst = 
+      match lst with
+      | [] -> []
+      | h :: t -> begin
+          let result = validate_node2 h 0 board upper_word [] [h] in 
+          let () = print_int (List.length result) in 
+          if ((List.length result)) = String.length word 
+          then result else node_loop t
+        end 
+    in (List.rev (node_loop nodes_fst_letter)) 
+  end
+
+let nodes_and_colors (word:string) (board:t) : (char*color) list = 
+  let helper = 
+    let nodes_of_word = is_valid_word2 word board in 
+    if (List.length nodes_of_word > 0) then 
+      if Trie.contains english_words word then 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Green)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+      else 
+        List.fold_left (fun acc node -> if List.mem node nodes_of_word then ((node.letter, Red)::acc) else ((node.letter, White)::acc) ) [] board.nodes
+    else 
+      List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
+  in List.rev helper 
+
 
 
 (** [validate_node node idx b str] does a depth first search for word [str] 
