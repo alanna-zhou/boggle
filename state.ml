@@ -29,11 +29,50 @@ let board (state:t) : Board.t =
 let words (state:t) : string list =
   Trie.to_list state.words
 
-let hint (state:t) : t =
+let get_random lst =
+  Random.self_init ();
+  print_int (List.length lst);
+  let index = Random.int (List.length lst) in 
+  List.nth lst index
+
+let rec get_difference lst1 lst2 =
+  match lst1 with
+  | [] -> []
+  | x::xs -> if List.mem x lst2 then get_difference xs lst2 else
+  x::(get_difference xs lst2)
+
+let rec hintify_help chars =
+  match chars with
+  | [] -> ""
+  | x::xs -> x ^ mystery_spaces xs
+and mystery_spaces remaining =
+  match remaining with
+  | [] -> ""
+  | x::xs -> "_" ^ mystery_spaces xs
+
+let rec string_to_list str =
+  match str with
+  | "" -> []
+  | _ -> (String.sub str 0 1)::
+  (string_to_list (String.sub str 1 ((String.length str) - 1)))
+
+let hintify str =
+  hintify_help (string_to_list str)
+
+let hint (state:t) : (t * string) =
 if state.hints_left <= 0 then failwith "No hints remaining" else
+let updated_state = 
   {board = state.board; score = state.score - 5; words = state.words;
   hints_left = state.hints_left - 1;start_time = state.start_time;
-  last_times = state.last_times}
+  last_times = state.last_times} in 
+  let hinted =
+  get_random (get_difference (Board.get_possible_words state.board) 
+  (Trie.to_list state.words))
+  in 
+  (updated_state, hintify hinted)
+
+let num_hints state =
+  state.hints_left
 
 let rec get_dif times =
   match times with

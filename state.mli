@@ -38,12 +38,19 @@ val score : t -> int
 val words : t -> string list
 
 (** [hint] is [t] after a hint has been requested by the user, points are
-  reduced by 5 and hints_left is reduced by 1.
+  reduced by 5 and hints_left is reduced by 1, as well as the hinted word
   @param state of type t
-  @return updated state of type t
+  @return updated state of type t and a hinted word
   Requires: state.hints_left > 0
-  Raises: None*)
-val hint : t -> t
+  Raises: None *)
+val hint : t -> (t * string)
+
+(** [num_hints] is the number of hints the user has remaining
+  @param state of type t
+  @return the number of hints remaining
+  Requires: none
+  Raises: None *)
+val num_hints : t -> int
 
 (** [update] allows the state to be updated when a new word has been entered by a player.
   @param old_state of type t

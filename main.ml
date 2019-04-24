@@ -87,7 +87,12 @@ To see instructions, enter #help.";
         else if not (Board.is_valid_word guess (State.board st)) 
         then raise (Failure guess)
         else playing_game time (State.update st guess) (guess :: found_wrds)
-      |Hint -> failwith "unimplemented";
+      |Hint -> if State.num_hints st < 1 then (
+      print_string "You are out of hints.";
+      playing_game time st found_wrds) else 
+      let hint_state = State.hint st in 
+      print_string ("Your hint is: " ^ (snd hint_state));
+      playing_game time (fst hint_state) found_wrds
     with 
     |Failure x -> ignore(clear 0);
       ANSITerminal.(print_string [red] (x));
