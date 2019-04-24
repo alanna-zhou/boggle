@@ -40,8 +40,6 @@ let words (state:t) : string list =
 let leaderboard (state:t) = 
   state.leaderboard
 
-
-
 let hint (state:t) : t =
   if state.hints_left <= 0 then failwith "No hints remaining" else
     {board = state.board; score = state.score - 5; words = state.words;
@@ -67,8 +65,6 @@ let fast_enough times =
 let multiplier score = 
   score * 3
 
-
-
 (** [update] updates a state with a newly added word by validating if the word 
     is a valid word (on the board and in the English language - this is dependent 
     upon Board's implementation of [is_valid_word]). *)
@@ -83,20 +79,20 @@ let update (state:t) (word:string) : t =
    hints_left=state.hints_left;start_time=state.start_time;
    last_times=(Unix.time ())::(state.last_times)}
 
-(**[key_compare x y] is a comparison function to sort the leaderboard.*)
+(** [key_compare x y] is a comparison function to sort the leaderboard.*)
 let key_compare x y = 
   if fst x < fst y then -1
   else if fst x > fst y then 1
   else 0 
 
-(**[print_score_list lst] is a helper function to print the
-   score list [lst] for each size within a leaderboard. *)
+(** [print_score_list lst] is a helper function to print the
+    score list [lst] for each size within a leaderboard. *)
 let rec print_score_list = function
   | [] -> ()
   | h::t -> print_int h; print_string "\n"; print_score_list t
 
-(**[print_leaderboard_helper l] is a helper function to print the
-   leaderboard [l]. *)
+(** [print_leaderboard_helper l] is a helper function to print the
+    leaderboard [l]. *)
 let rec print_leaderboard_helper l = 
   match l with
   | [] -> ()
