@@ -262,7 +262,7 @@ and end_game game_number st wrds time=
       )/. 10.);
   print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
-      (size (board st)) []  in
+      (size (board st))  in
   let () = print_leaderboard new_leaderboard in 
   (prompt_end game_number (new_leaderboard) ())
 

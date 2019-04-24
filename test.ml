@@ -12,15 +12,9 @@ let board3 = testing_board3 ()
 let empty_board = generate (Random 0)
 
 
-let state_0 = init board []
-let state_1 = update state_0 "i"
-let state_2 = update state_1 "tip"
-let state_3 = update state_2 "rat"
 
-let leaderboard_new = [(4, [10; 20]); (5, [8])]
-let next_state = init board leaderboard_new 
-let next_state_2 = update next_state "hi"
-let next_leaderboard = add_leaderboard (leaderboard next_state_2) [50] 5 []
+
+
 
 
 
@@ -62,6 +56,7 @@ let die2_3 = [|'H';'M';'S';'R';'A';'O'|]
 let standard_2 = [|die2_0; die2_1; die2_2; die2_3|]
 
 let board_tests = [
+  (**Board size test *)
   "board size" >:: (fun _ -> assert_equal 4 (size board));
 
   (**Checking whether words of length 1, 2, 3 can be found on the board. *)
@@ -98,17 +93,48 @@ let board_tests = [
 
 ]
 
+let state_0 = init board []
+let state_1 = update state_0 "i"
+let state_2 = update state_1 "tip"
+let state_3 = update state_2 "rat"
+
+let empty_state = init board []
+let step_leaderboard = add_leaderboard (leaderboard empty_state) [10] 4 
+let state_next = init board step_leaderboard
+let step2_leaderboard = add_leaderboard (leaderboard state_next) [10] 5
+
+
+
+
 let state_tests = [
   (**Checking if score is updated when word found on board.*)
   "update test 0" >:: (fun _ -> assert_equal 0 (score state_0));
-  "update test 1" >:: (fun _ -> assert_equal 3 (score state_1));
-  "update test 2" >:: (fun _ -> assert_equal 18 (score state_2));
-  "update test 3" >:: (fun _ -> assert_equal 27 (score state_3));
+  "update test 1" >:: (fun _ -> assert_equal 1 (score state_1));
+  "update test 2" >:: (fun _ -> assert_equal 16 (score state_2));
+  "update test 3" >:: (fun _ -> assert_equal 25 (score state_3));
 
   (**Checking if found words are saved in state *)
   ("words test" >:: (fun _ -> assert_equal (true)
                         (cmp_set_like_lists ["i"; "tip"; "rat"] 
-                           (words state_3))))
+                           (words state_3))));
+
+  (**Checking if leaderboard is updated correctly in add_leaderboard*)
+  ("leaderboard test empty" >:: (fun _ -> assert_equal ([(4, [10])]) 
+                                    (step_leaderboard)));
+
+  ("leaderboard test with contents" >:: (fun _ -> assert_equal 
+                                            ([(5, [10]); (4, [10])]) 
+                                            (step2_leaderboard)));
+
+  (**Checking leaderboard function *)
+  ("leaderboard test" >:: (fun _ -> assert_equal [] 
+                              (leaderboard empty_state)));
+
+  ("leaderboard test 2" >:: (fun _ -> assert_equal ([(4, [10])]) 
+                                (leaderboard state_next)));
+
+
+
 ]
 
 let trie0 = Trie.empty
@@ -133,7 +159,7 @@ let trie_tests = [
 ]
 
 
-let bfs_tests = [
+let get_possible_words_tests = [
   "empty board BFS" >:: (fun _ -> assert_equal (true)
                             (cmp_set_like_lists (get_possible_words empty_board) 
                                [] ));
@@ -177,10 +203,12 @@ let get_colors (lst:(char*color) list) : color list =
 (* testing for an empty string so the board should be colored white *)
 let empty_board3_result = nodes_and_colors "" board3
 
-(* testing for a word that is on the board, but not an english word, so it should be colored red *)
+(* testing for a word that is on the board, but not an english word, 
+   so it should be colored red *)
 let bds_board3_result = nodes_and_colors "bds" board3
 
-(* testing for a word that is on the board and an english word, so it should be colored green *)
+(* testing for a word that is on the board and an english word, 
+   so it should be colored green *)
 let dealt_board3_result = nodes_and_colors "dealt" board3
 
 let nodes_and_colors_tests = [
@@ -213,7 +241,7 @@ let suite = "test suite for A6" >::: List.flatten [
     board_tests; 
     state_tests; 
     trie_tests;
-    bfs_tests;
+    get_possible_words_tests;
     nodes_and_colors_tests;
   ]
 

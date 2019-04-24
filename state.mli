@@ -51,18 +51,18 @@ val score : t -> int
 val words : t -> string list
 
 (** [hint] is [t] after a hint has been requested by the user, points are
-  reduced by 5 and hints_left is reduced by 1, as well as the hinted word
-  @param state of type t
-  @return updated state of type t and a hinted word
-  Requires: state.hints_left > 0
-  Raises: None *)
+    reduced by 5 and hints_left is reduced by 1, as well as the hinted word
+    @param state of type t
+    @return updated state of type t and a hinted word
+    Requires: state.hints_left > 0
+    Raises: None *)
 val hint : t -> (t * string)
 
 (** [num_hints] is the number of hints the user has remaining
-  @param state of type t
-  @return the number of hints remaining
-  Requires: none
-  Raises: None *)
+    @param state of type t
+    @return the number of hints remaining
+    Requires: none
+    Raises: None *)
 val num_hints : t -> int
 
 (** [update] allows the state to be updated when a new word has been entered by 
@@ -101,7 +101,7 @@ val leaderboard: t -> (int * (int list)) list
     Raises: N/A
     Example: [add_leaderboard l [5; 10] 5 [] = [(5, [5;10])] *)
 val add_leaderboard: (int * (int list)) list -> int list -> 
-  int -> (int * (int list)) list -> (int * (int list)) list
+  int -> (int * (int list)) list
 
 (**[print_leaderboard l] prints out the leaderboard to the console.
    @param l is the leadrboard
