@@ -19,29 +19,39 @@ let rec prompt_board_size () =
     prompt_board_size ()
 
 let format_color (board:Board.t) (size:size) (word:string): unit =
+  print_string " ";
+  let rec tborder count =
+    match count with 
+    |0 -> ()
+    |n -> print_string"_"; tborder (count-1) in ignore(tborder (2*size-1));
+  print_string("\n|");
   let node_color_lst = nodes_and_colors word board in
   let rec helper lst () i left=
     let n = (i mod size) in 
     match lst with 
     | [] -> ()
     | (letter, color)::t -> 
-      (*if left=1 then
+      if left=1 then
         begin match color with 
-          | Green ->helper t (ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
-          | Red -> helper t (ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
-          | White ->helper t (ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+          | Green ->if n<> 0 then helper t (ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [green; Underlined] ((Char.escaped letter)))
+          | Red -> if n<> 0 then helper t (ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [red; Underlined] ((Char.escaped letter)))
+          | White ->if n<> 0 then helper t (ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [white; Underlined] ((Char.escaped letter)))
         end
-        else*)
-      begin match color with 
-        | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) (left)
-          else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) (left-1)
-        | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) (left)
-          else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) (left-1)
-        | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) (left)
-          else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) (left-1)
-      end
+      else
+        begin match color with 
+          | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
+          | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
+          | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));print_string "|\n|") (i+1) (left-1)
+        end
 
-  in helper node_color_lst () 1 size
+  in (helper node_color_lst () 1 size);
+  print_string "|"
 
 let rec prompt_board_file () =
   try 
@@ -144,7 +154,6 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
     end_game game_number st found_wrds time
   else begin
     try 
-      print_string "\n"; 
       format_color (State.board st) (Board.size (State.board st)) (lguess);
       print_string ("\nWords found: " ^ 
                     (make_list found_wrds "") ^ "\nEnter a word: ");
@@ -196,9 +205,9 @@ and end_game game_number st wrds time=
 
   print_string ("\nWords missed.\n");
   print_list (unfound wrds (Board.get_possible_words (State.board st)) []);
-  print_string ("Average time between words: ");
-  print_float ((float (List.length wrds)) 
-               /. (min (90. -. (time-. Unix.time ())) 90. ));
+  print_string ("\nAverage time between words: ");
+  print_float ((min (90. -. (time-. Unix.time ())) 90. ) 
+               /. (float (List.length wrds)));
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
   let () = print_leaderboard new_leaderboard in 
@@ -245,7 +254,7 @@ let word_blitz_art () =
   print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
-               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
+               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n\n"
 
 
 
