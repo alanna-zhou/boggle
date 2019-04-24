@@ -144,11 +144,38 @@ let bfs_tests = [
                                 ["delta"; "dealt"; "deal"; "deb"; "dens"; "den"; "dates"; "date"; "dab"; "dales"; "dale"; "dal"; "late"; "lab"; "lads"; "laden"; "lade"; "lad"; "leads"; "lead"; "lea"; "led"; "let"; "lends"; "lend"; "lens"; "len"; "leeds"; "lees"; "lee"; "bales"; "bale"; "bates"; "bated"; "bate"; "bat"; "bade"; "bad"; "ba"; "beat"; "beads"; "bead"; "belt"; "beds"; "bed"; "been"; "bee"; "beta"; "bet"; "bends"; "bend"; "ben"; "be"; "abel"; "abed"; "abet"; "abe"; "ate"; "at"; "ales"; "ale"; "al"; "aden"; "ad"; "a"; "tales"; "tale"; "tab"; "ta"; "teal"; "tea"; "tele"; "tel"; "ted"; "teens"; "teen"; "tee"; "tends"; "tend"; "tens"; "ten"; "te"; "elates"; "elated"; "elate"; "eat"; "eta"; "ene"; "ends"; "end"; "ens"; "eel"; "ed"; "send"; "seat"; "seal"; "sea"; "seen"; "see"; "set"; "se"; "neat"; "net"; "needs"; "need"; "nee"; "ne"]));
 ]
 
+(* helper function to get the list of letters from a (letter,color) list *)
+let get_letters (lst:(char*color) list) : char list = 
+  List.map (fun x -> fst x) lst 
+
+(* helper function to get the list of colors from a (letter,color) list *)
+let get_colors (lst:(char*color) list) : color list = 
+  List.map (fun x -> snd x) lst 
+
+(* testing for an empty string so the board should be colored white *)
+let empty_board3_result = nodes_and_colors "" board3
+
+(* testing for a word that is on the board, but not an english word, so it should be colored red *)
+let bds_board3_result = nodes_and_colors "bds" board3
+
+(* testing for a word that is on the board and an english word, so it should be colored green *)
+let dealt_board3_result = nodes_and_colors "dealt" board3
+
+let nodes_and_colors_tests = [
+  "nodes_and_colors empty board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters empty_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors empty board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors empty_board3_result) = [White; White; White; White; White; White; White; White; White]) );
+  "nodes_and_colors bds board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters bds_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors bds board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors bds_board3_result) = [Red; White; White; Red; White; White; Red; White; White]) );
+  "nodes_and_colors dealt board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters dealt_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors dealt board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors dealt_board3_result) = [White; Green; Green; Green; Green; Green; White; White; White]) );
+]
+
 let suite = "test suite for A6" >::: List.flatten [
     board_tests; 
     state_tests; 
     trie_tests;
     bfs_tests;
+    nodes_and_colors_tests;
   ]
 
 

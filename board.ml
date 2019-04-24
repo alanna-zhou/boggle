@@ -529,6 +529,7 @@ let rec validate_node2 (node:node) (index:int) (board:t) (str:string)
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word2 (word:string) (board:t) : node list = 
+  if String.length word = 0 then [] else 
   let upper_word = String.uppercase_ascii word in
   let first_char = upper_word.[0] in 
   let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
