@@ -42,48 +42,45 @@ let format_color (board:Board.t) (size:size) (word:string): unit =
     | (letter, color)::t -> 
       if left=1 then
         begin match color with 
-          | Green ->if n<> 0 then 
-              helper t (ANSITerminal.(print_string [green; Underlined] 
-                                        ((Char.escaped letter) ^ " ")))
-                (i+1) (left)
+          | Green ->if n<> 0 then helper t 
+                (ANSITerminal.(print_string [green; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
             else ANSITerminal.(print_string [green; Underlined] 
                                  ((Char.escaped letter)))
-          | Red -> if n<> 0 then 
-              helper t (ANSITerminal.(print_string [red; Underlined] 
-                                        ((Char.escaped letter) ^ " "))) 
-                (i+1) (left)
+          | Red -> if n<> 0 then helper t 
+                (ANSITerminal.(print_string [red; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
             else ANSITerminal.(print_string [red; Underlined] 
                                  ((Char.escaped letter)))
-          | White ->if n<> 0 then 
-              helper t (ANSITerminal.(print_string [white; Underlined] 
-                                        ((Char.escaped letter) ^ " "))) 
-                (i+1) (left)
-            else ANSITerminal.(print_string [white; Underlined] 
+          | White ->if n<> 0 then helper t 
+                (ANSITerminal.(print_string [white; Underlined] 
+                                 ((Char.escaped letter) ^ " "))) (i+1) (left)
+            else ANSITerminal.(print_string [white; Underlined]
                                  ((Char.escaped letter)))
         end
       else
         begin match color with 
-          | Green -> if n <> 0 then 
-              helper t (ANSITerminal.(print_string [green] 
-                                        ((Char.escaped letter)^ " "))) 
-                (i+1) (left)
-            else helper t (ANSITerminal.(print_string [green] 
-                                           (Char.escaped letter));
-                           print_string "|\n|") (i+1) (left-1)
-          | Red -> if n <> 0 then 
-              helper t (ANSITerminal.(print_string [red] 
-                                        ((Char.escaped letter)^ " "))) 
-                (i+1) (left)
-            else helper t (ANSITerminal.(print_string [red] 
-                                           (Char.escaped letter));
-                           print_string "|\n|") (i+1) (left-1)
-          | White -> if n <> 0 then 
-              helper t (ANSITerminal.(print_string [white] 
-                                        ((Char.escaped letter)^ " "))) 
-                (i+1) (left)
-            else helper t (ANSITerminal.(print_string [white] 
-                                           (Char.escaped letter));
-                           print_string "|\n|") (i+1) (left-1)
+          | Green -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [green] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [green] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
+          | Red -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [red] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [red] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
+          | White -> if n <> 0 then helper t 
+                (ANSITerminal.(print_string [white] 
+                                 ((Char.escaped letter)^ " "))) (i+1) (left)
+            else helper t 
+                (ANSITerminal.(print_string [white] 
+                                 (Char.escaped letter));
+                 print_string "|\n|") (i+1) (left-1)
         end
 
   in (helper node_color_lst () 1 size);
@@ -105,7 +102,7 @@ and prompt_board_type game_number leaderboard () =
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
   |"s" -> begin 
-      print_string "\nDo you want to create a board with customized die or use \
+      print_string "\nDo you want to create a board with customized die or use\
                     built in standard boards? \nType b for built-in, and cd \
                     for custom die. ";
       match read_line () with 
@@ -285,7 +282,7 @@ and end_game game_number st wrds time=
      /. 10.);
   print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
-      (size (board st)) []  in
+      (size (board st))  in
   let () = print_leaderboard new_leaderboard in 
   (prompt_end game_number (new_leaderboard) ())
 

@@ -142,12 +142,20 @@ let print_leaderboard l = print_string "\n";
     (ANSITerminal.(print_string [red] "******LEADERBOARD********"); 
      print_leaderboard_helper (List.rev (List.sort key_compare l)))
 
-let rec add_leaderboard (old_leaderboard) (score:int list) (size:int) (acc) =  
+(** [add_leaderboard_help l] is a helper function used by add_leaderboard
+    to add to the leaderboard [old_leaderboard] *)
+let rec add_leaderboard_help (old_leaderboard) (score:int list) (size:int) 
+    (acc) =  
   match old_leaderboard with 
   | [] -> ((size, score)::acc)
   | (h_size, lst)::t -> if h_size = size then begin
       let new_lst = (score@lst) in 
       let sorted_list = List.rev (List.sort compare new_lst) in 
-      add_leaderboard t sorted_list size (acc) 
-    end else add_leaderboard t score size ((h_size, lst)::acc)
+      add_leaderboard_help t sorted_list size (acc) 
+    end else add_leaderboard_help t score size ((h_size, lst)::acc)
+
+
+let rec add_leaderboard (old_leaderboard) (score:int list) (size:int) =  
+  add_leaderboard_help old_leaderboard score size []
+
 

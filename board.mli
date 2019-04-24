@@ -12,7 +12,9 @@ type t
 (** The size of the square board, the height and width. *)
 type size = int
 
-(** The color of a letter. If the letter is found on the board and part of an english word that the user entered, it is green. If it is found on the board and not part of an english word, it is red. Default is white.  *)
+(** The color of a letter. If the letter is found on the board and part of an 
+    english word that the user entered, it is green. If it is found on the board 
+    and not part of an english word, it is red. Default is white.  *)
 type color = Red | Green | White
 
 (** The file name of file with required data. *)
@@ -117,12 +119,25 @@ val testing_board2: unit -> t
     Example: [testing_board1 ()] returns a board.*)
 val testing_board3: unit -> t
 
-(** [nodes_and_colors word board] returns a list of letter and color tuples,      with the letter being that of the node on the board, and color being either   Green, Red, or White. This is to highlight the nodes on the board that make   up the word passed in to this method. If the word is found on the board but   is not an English word, it is colored red. If the word is found on the        board and is an English word, it is colored green. If the word is not found   on the board, it is colored white just like the rest of the letters on the    board.
+(** [nodes_and_colors word board] returns a list of letter and color tuples,
+    with the letter being that of the node on the board, and color being either 
+    Green, Red, or White. This is to highlight the nodes on the board that make 
+    up the word passed in to this method. If the word is found on the board but 
+    is not an English word, it is colored red. If the word is found on the 
+    board and is an English word, it is colored green. If the word is not found 
+    on the board, it is colored white just like the rest of the letters on the 
+    board.
     @param word the word needed to be colored on the board
     @param board for the word to be searched on
     @return letter and color tuple list to help main know what letters to color
     Raises: No Exceptions
+<<<<<<< HEAD
     Example: [nodes_and_colors "bad" (testing_board3 ())] returns [('B', Green); ('A', Green); ('T', White); ('D', Green); ('E', White); ('L', White); ('S', White); ('N', White); ('E', White)]
+=======
+    Example: [nodes_and_colors "bad" (testing_board3 ())] returns [('B', Green);
+    ('A', Green); ('T', White); ('D', Green); ('E', White); ('L', White);
+     ('S', White); ('N', White); ('E', White)]
+>>>>>>> 8166cfb00d5d0328533f7f4d17a6518eab431cf2
 *)
 val nodes_and_colors : string -> t -> (char*color) list
 
