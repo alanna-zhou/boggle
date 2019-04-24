@@ -288,7 +288,7 @@ let word_blitz_art () =
 
 let main () =
   ignore (clear 0);
-  print_string "Welcome to \n";
+  print_string "Welcome to \n\n";
   word_blitz_art ();
   print_string "\nForm and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
