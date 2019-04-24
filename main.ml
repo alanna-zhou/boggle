@@ -19,7 +19,7 @@ let rec prompt_board_size () =
     prompt_board_size ()
 
 let format_color (board:Board.t) (size:size) (word:string): unit =
-  print_string " ";
+  print_string "\n ";
   let rec tborder count =
     match count with 
     |0 -> ()
@@ -61,12 +61,12 @@ let rec prompt_board_file () =
     prompt_board_file ()
 
 and prompt_board_type game_number leaderboard () =
-  print_endline "\nWhat kind of board would you like?";
+  print_string "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
   match  read_line () with
   |"s" -> begin 
       print_string "\nDo you want to create a board with customized die or use\
-                    built in standard boards? Type b for builtin, and cd for \
+                    built in standard boards? \nType b for built-in, and cd for \
                     custom die. ";
       match read_line () with 
       |"b" -> begin
@@ -200,25 +200,31 @@ and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
-  print_string ("\nWords found.\n");
-  print_list wrds;
+  print_string ("\nWords found:\n");
+  print_green_list wrds;
 
-  print_string ("\nWords missed.\n");
-  print_list (unfound wrds (Board.get_possible_words (State.board st)) []);
+  print_string ("\nWords missed:\n");
+  print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) []);
   print_string ("\nAverage time between words: ");
   print_float ((min (90. -. (time-. Unix.time ())) 90. ) 
                /. (float (List.length wrds)));
+  print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
   let () = print_leaderboard new_leaderboard in 
   (prompt_end game_number (new_leaderboard) ())
 
-and print_list lst =
+and print_yellow_list lst =
   match lst with
   |[]-> ()
-  |h::t-> if t = [] then (print_string (h); print_list t)
-    else print_string (h ^ ", "); print_list t
-(** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
+  |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h); print_yellow_list t)
+    else (ANSITerminal.(print_string [yellow] (h ^ ", "))); print_yellow_list t
+
+and print_green_list lst =
+  match lst with
+  |[]-> ()
+  |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); print_green_list t)
+    else (ANSITerminal.(print_string [green] (h ^ ", "))); print_green_list t
 
 and unfound found total acc=
   match total with
@@ -254,19 +260,19 @@ let word_blitz_art () =
   print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
-               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n\n"
+               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
 
 
 
 let main () =
   ignore (clear 0);
-  print_string "Welcome to \n\n";
+  print_string "Welcome to \n";
   word_blitz_art ();
-  print_string "Form and enter words contained on the \
+  print_string "\nForm and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
-                diagonally.  At any time, type #help for gameplay instructions.\
+                diagonally. \nAt any time, type #help for gameplay instructions.\
                 You can choose a board of your desired size, and configure a \
-                board the way you want. You cannot use a board element more \
+                board the way you want. \nYou cannot use a board element more \
                 than once on the board. Type #hint for a hint, but do know \
                 that you have a maximum of 3 hints - each hint will lead to a \
                 small score deduction. \n";
