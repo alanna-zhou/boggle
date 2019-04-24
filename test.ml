@@ -96,11 +96,6 @@ let board_tests = [
   "score test3" >:: (fun _ -> assert_equal 1
                         (word_score "i" board));
 
-  (** Custom die board *)
-  (*"custom 4x4 dice" >:: (fun _ -> assert_equal standard_4 
-                            (create_die_arr "4x4.txt" 4)); 
-    "custom 2x2 dice" >:: (fun _ -> assert_equal standard_2 
-                            (create_die_arr "2x2.txt" 2))*)
 ]
 
 let state_tests = [
@@ -112,36 +107,63 @@ let state_tests = [
 
   (**Checking if found words are saved in state *)
   ("words test" >:: (fun _ -> assert_equal (true)
-                        (cmp_set_like_lists ["i"; "tip"; "rat"] (words state_3))))
+                        (cmp_set_like_lists ["i"; "tip"; "rat"] 
+                           (words state_3))))
 ]
 
 let trie0 = Trie.empty
 let trie1 = Trie.add_words_from_file "words.txt"
 let trie2 = Trie.add_word (Trie.add_word Trie.empty "computer") "computers"
 let trie_tests = [
-  "contains 'rat'" >:: (fun _ -> assert_equal true (contains trie1 "rat"));
-  "contains 'rats'" >:: (fun _ -> assert_equal true (contains trie1 "rats"));
-  "contains 'I'" >:: (fun _ -> assert_equal true (contains trie1 "I"));
-  "contains 'computer'" >:: (fun _ -> assert_equal true (contains trie2 "computer"));
-  "does not contain 'afdsasi'" >:: (fun _ -> assert_equal false (contains trie1 "afdsasi"));
-  "empty trie is empty" >:: (fun _ -> assert_equal false (contains trie0 "anything"));
-  "to_list test" >:: (fun _ -> assert_equal true (cmp_set_like_lists ["computer"; "computers"] (to_list trie2)))
+  "contains 'rat'" >:: (fun _ -> assert_equal true (contains trie1
+                                                      "rat"));
+  "contains 'rats'" >:: (fun _ -> assert_equal true (contains trie1 
+                                                       "rats"));
+  "contains 'I'" >:: (fun _ -> assert_equal true (contains trie1 
+                                                    "I"));
+  "contains 'computer'" >:: (fun _ -> assert_equal true (contains trie2 
+                                                           "computer"));
+  "does not contain 'afdsasi'" >:: (fun _ -> assert_equal false 
+                                       (contains trie1 "afdsasi"));
+  "empty trie is empty" >:: (fun _ -> assert_equal false (contains trie0 
+                                                            "anything"));
+  "to_list test" >:: (fun _ -> assert_equal true 
+                         (cmp_set_like_lists ["computer"; "computers"] 
+                            (to_list trie2)))
 ]
 
 
 let bfs_tests = [
   "empty board BFS" >:: (fun _ -> assert_equal (true)
-                           (cmp_set_like_lists (get_possible_words empty_board) 
-                              [] ));
+                            (cmp_set_like_lists (get_possible_words empty_board) 
+                               [] ));
   " B A
     D E board BFS" >:: (fun _ -> assert_equal (true)
                            (cmp_set_like_lists (get_possible_words board2) 
-                              ["deb"; "dab"; "bade"; "bad"; "ba"; "bead"; "bed"; "be"; "abed"; "abe"; "ad";"a"; "ed"] ));
+                              ["deb"; "dab"; "bade"; "bad"; "ba"; "bead"; "bed"; 
+                               "be"; "abed"; "abe"; "ad";"a"; "ed"] ));
   " B A T
     D E L
     S N E board BFS" >:: (fun _ -> assert_equal (true)
                              (cmp_set_like_lists (get_possible_words board3) 
-                                ["delta"; "dealt"; "deal"; "deb"; "dens"; "den"; "dates"; "date"; "dab"; "dales"; "dale"; "dal"; "late"; "lab"; "lads"; "laden"; "lade"; "lad"; "leads"; "lead"; "lea"; "led"; "let"; "lends"; "lend"; "lens"; "len"; "leeds"; "lees"; "lee"; "bales"; "bale"; "bates"; "bated"; "bate"; "bat"; "bade"; "bad"; "ba"; "beat"; "beads"; "bead"; "belt"; "beds"; "bed"; "been"; "bee"; "beta"; "bet"; "bends"; "bend"; "ben"; "be"; "abel"; "abed"; "abet"; "abe"; "ate"; "at"; "ales"; "ale"; "al"; "aden"; "ad"; "a"; "tales"; "tale"; "tab"; "ta"; "teal"; "tea"; "tele"; "tel"; "ted"; "teens"; "teen"; "tee"; "tends"; "tend"; "tens"; "ten"; "te"; "elates"; "elated"; "elate"; "eat"; "eta"; "ene"; "ends"; "end"; "ens"; "eel"; "ed"; "send"; "seat"; "seal"; "sea"; "seen"; "see"; "set"; "se"; "neat"; "net"; "needs"; "need"; "nee"; "ne"]));
+                                ["delta"; "dealt"; "deal"; "deb"; "dens"; "den"; 
+                                 "dates"; "date"; "dab"; "dales"; "dale"; "dal"; 
+                                 "late"; "lab"; "lads"; "laden"; "lade"; "lad"; 
+                                 "leads"; "lead"; "lea"; "led"; "let"; "lends"; 
+                                 "lend"; "lens"; "len"; "leeds"; "lees"; "lee"; 
+                                 "bales"; "bale"; "bates"; "bated"; "bate"; 
+                                 "bat"; "bade"; "bad"; "ba"; "beat"; "beads"; 
+                                 "bead"; "belt"; "beds"; "bed"; "been"; "bee"; 
+                                 "beta"; "bet"; "bends"; "bend"; "ben"; "be"; 
+                                 "abel"; "abed"; "abet"; "abe"; "ate"; "at"; 
+                                 "ales"; "ale"; "al"; "aden"; "ad"; "a"; 
+                                 "tales"; "tale"; "tab"; "ta"; "teal"; "tea"; 
+                                 "tele"; "tel"; "ted"; "teens"; "teen"; "tee"; 
+                                 "tends"; "tend"; "tens"; "ten"; "te"; "elates"; 
+                                 "elated"; "elate"; "eat"; "eta"; "ene"; "ends"; 
+                                 "end"; "ens"; "eel"; "ed"; "send"; "seat"; 
+                                 "seal"; "sea"; "seen"; "see"; "set"; "se"; 
+                                 "neat"; "net"; "needs"; "need"; "nee"; "ne"]));
 ]
 
 (* helper function to get the list of letters from a (letter,color) list *)
@@ -162,12 +184,19 @@ let bds_board3_result = nodes_and_colors "bds" board3
 let dealt_board3_result = nodes_and_colors "dealt" board3
 
 let nodes_and_colors_tests = [
-  "nodes_and_colors empty board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters empty_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
-  "nodes_and_colors empty board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors empty_board3_result) = [White; White; White; White; White; White; White; White; White]) );
-  "nodes_and_colors bds board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters bds_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
-  "nodes_and_colors bds board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors bds_board3_result) = [Red; White; White; Red; White; White; Red; White; White]) );
-  "nodes_and_colors dealt board3 letters" >:: (fun _ -> assert_equal (true) ((get_letters dealt_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
-  "nodes_and_colors dealt board3 colors" >:: (fun _ -> assert_equal (true) ((get_colors dealt_board3_result) = [White; Green; Green; Green; Green; Green; White; White; White]) );
+  "nodes_and_colors empty board3 letters" >:: (fun _ -> assert_equal (true)
+                                                  ((get_letters empty_board3_result)
+                                                   = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors empty board3 colors" >:: (fun _ -> assert_equal (true)
+                                                 ((get_colors empty_board3_result) = [White; White; White; White; White; White; White; White; White]) );
+  "nodes_and_colors bds board3 letters" >:: (fun _ -> assert_equal (true) 
+                                                ((get_letters bds_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors bds board3 colors" >:: (fun _ -> assert_equal (true) 
+                                               ((get_colors bds_board3_result) = [Red; White; White; Red; White; White; Red; White; White]) );
+  "nodes_and_colors dealt board3 letters" >:: (fun _ -> assert_equal (true)
+                                                  ((get_letters dealt_board3_result) = ['B'; 'A'; 'T'; 'D'; 'E'; 'L'; 'S'; 'N'; 'E']) );
+  "nodes_and_colors dealt board3 colors" >:: (fun _ -> assert_equal (true) 
+                                                 ((get_colors dealt_board3_result) = [White; Green; Green; Green; Green; Green; White; White; White]) );
 ]
 
 let suite = "test suite for A6" >::: List.flatten [
@@ -177,27 +206,5 @@ let suite = "test suite for A6" >::: List.flatten [
     bfs_tests;
     nodes_and_colors_tests;
   ]
-
-
-(*let board4x4 = generate (Custom_die ("4x4.txt", 4))
-  let () = format board4x4 4 *)
-
-let board4x4 = generate (Standard 4)
-let () = format board4x4 4 
-
-let board5x5 = generate (Standard 5)
-let () = format board5x5 5 
-
-(*let board6x6 = generate (Custom_die ("6x6.txt", 6))
-  let () = format board6x6 6
-
-  let board20x20 = generate (Custom_die ("20x20.txt", 20))
-  let () = format board20x20 20*)
-
-let board_custom = generate (Custom_board ("board1.txt", 4))
-let () = format board_custom 4
-
-let board_custom2 = generate (Custom_board ("board2.txt", 5))
-let () = format board_custom2 5
 
 let _ = run_test_tt_main suite

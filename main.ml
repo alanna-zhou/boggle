@@ -172,11 +172,24 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
       print_string ("Your hint is: " ^ (snd hint_state) ^ "\n");
       playing_game time (fst hint_state) found_wrds game_number lguess
       |Help -> print_string "\nTo play a word, enter that word.\
-                             To see your current score, enter #score.\
+                             \nTo see your current score, enter #score.\
                              \nTo quit/restart game, enter #quit.\
-                             For a hint, enter #hint.\
-                             To see the leaderboard, enter #leaderboard.\
-                             To see instructions, enter #help.\n";
+                             \nFor a hint, enter #hint.\
+                             \nTo see the leaderboard, enter #leaderboard.\
+                             \nTo see instructions, enter #help.
+                             \nIf you want to input custom boards, or custom \
+                             die, you can upload txt files for those. \
+                             \n\nFor custom die, see 4x4.txt as an example. \
+                             Line number x contains the 6 sided configurations\
+                             for each die on position number x on the board. \
+                             These are capital letters not separated by any \
+                             space. For a 4x4 board, you must have 16 lines \
+                             corresponding to the 16 die. \n\n\
+                             For custom boards, see board1.txt as an example \
+                             txt file. The board is drawn out with no spaces \
+                             between characters. The number of lines in the \
+                             file should correspond to the dimension of the \
+                             board. \n";
         playing_game time st found_wrds game_number ""
       |Entry (guess) -> 
         ignore(clear 0);
@@ -225,7 +238,7 @@ and print_list lst =
   |[]-> ()
   |h::t-> if t = [] then (print_string (h); print_list t)
     else print_string (h ^ ", "); print_list t
-(** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
+
 
 and unfound found total acc=
   match total with
@@ -233,6 +246,8 @@ and unfound found total acc=
   |h::t-> if List.mem h found then unfound found t acc
     else unfound found t (h::acc)
 
+(** [prompt_end] asks for user input on whether or not they'd like to 
+    continue playing.  *)
 and prompt_end game_number leaderboard () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
