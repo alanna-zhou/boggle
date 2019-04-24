@@ -17,7 +17,8 @@ type t = {
 let init (board:Board.t) (leaderboard): t = 
   {board=board;score=0;words=Trie.empty;leaderboard = leaderboard;
    hints_left=3;start_time=Unix.time ();
-   last_times=[Unix.time ();Unix.time ();Unix.time ();Unix.time ();Unix.time ()]}
+   last_times=[Unix.time ();Unix.time ();Unix.time ();Unix.time ();
+               Unix.time ()]}
 
 
 (** [score] provides the score of the list of words that the player has been 
@@ -82,16 +83,20 @@ let update (state:t) (word:string) : t =
    hints_left=state.hints_left;start_time=state.start_time;
    last_times=(Unix.time ())::(state.last_times)}
 
-
+(**[key_compare x y] is a comparison function to sort the leaderboard.*)
 let key_compare x y = 
   if fst x < fst y then -1
   else if fst x > fst y then 1
   else 0 
 
+(**[print_score_list lst] is a helper function to print the
+   score list [lst] for each size within a leaderboard. *)
 let rec print_score_list = function
   | [] -> ()
   | h::t -> print_int h; print_string "\n"; print_score_list t
 
+(**[print_leaderboard_helper l] is a helper function to print the
+   leaderboard [l]. *)
 let rec print_leaderboard_helper l = 
   match l with
   | [] -> ()

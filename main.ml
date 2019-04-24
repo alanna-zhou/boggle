@@ -182,7 +182,7 @@ and print_list lst =
   |[]-> ()
   |h::t-> if t = [] then (print_string (h); print_list t)
     else print_string (h ^ ", "); print_list t
-(** [prompt_end] asks for user input on whether or not they'd like to continue playing.  *)
+
 
 and unfound found total acc=
   match total with
@@ -190,6 +190,8 @@ and unfound found total acc=
   |h::t-> if List.mem h found then unfound found t acc
     else unfound found t (h::acc)
 
+(** [prompt_end] asks for user input on whether or not they'd like to 
+    continue playing.  *)
 and prompt_end game_number leaderboard () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
@@ -203,7 +205,7 @@ and is_game_over time =
 
 
 let word_blitz_art () =
-  print_string "WW               WW                                   dd            BBBBBB      lll             tt\n";
+  print_string "WW               WW                                   dd      \      BBBBBB      lll             tt\n";
   print_string "WW               WW                                   dd            BB   BB      ll           tttttt\n";
   print_string " WW             WW                                    dd            BB   BB      ll     ii      tt\n";
   print_string " WW      W      WW      ooooo      rr rrr       ddddd dd            BBBBBB       ll             tt      zzzzzz\n";
@@ -219,12 +221,24 @@ let format_color (board:Board.t) (size:size) (word:string) : unit =
     match lst with 
     | [] -> ()
     | (letter, color)::t -> match color with 
-      | Green -> if n <> 0 then helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));ANSITerminal.(print_string [green] " ");ANSITerminal.(print_string [green] "\n")) (i+1) 
-      | Red -> if n <> 0 then helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));ANSITerminal.(print_string [red] " ");ANSITerminal.(print_string [red] "\n")) (i+1) 
-      | White -> if n <> 0 then helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ")) (i+1) 
-        else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));ANSITerminal.(print_string [white] " ");ANSITerminal.(print_string [white] "\n")) (i+1) 
+      | Green -> if n <> 0 then helper t 
+            (ANSITerminal.(print_string [green] (Char.escaped letter));
+             ANSITerminal.(print_string [green] " ")) (i+1) 
+        else helper t (ANSITerminal.(print_string [green] (Char.escaped letter));
+                       ANSITerminal.(print_string [green] " ");
+                       ANSITerminal.(print_string [green] "\n")) (i+1) 
+      | Red -> if n <> 0 then helper t 
+            (ANSITerminal.(print_string [red] (Char.escaped letter));
+             ANSITerminal.(print_string [red] " ")) (i+1) 
+        else helper t (ANSITerminal.(print_string [red] (Char.escaped letter));
+                       ANSITerminal.(print_string [red] " ");
+                       ANSITerminal.(print_string [red] "\n")) (i+1) 
+      | White -> if n <> 0 then helper t 
+            (ANSITerminal.(print_string [white] (Char.escaped letter));
+             ANSITerminal.(print_string [white] " ")) (i+1) 
+        else helper t (ANSITerminal.(print_string [white] (Char.escaped letter));
+                       ANSITerminal.(print_string [white] " ");
+                       ANSITerminal.(print_string [white] "\n")) (i+1) 
   in helper node_color_lst () 1
 
 let main () =
