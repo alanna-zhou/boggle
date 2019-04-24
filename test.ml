@@ -3,20 +3,10 @@ open Board
 open State
 open Trie
 
-
-
-
 let board = testing_board1 ()
 let board2 = testing_board2 ()
 let board3 = testing_board3 ()
 let empty_board = generate (Random 0)
-
-
-
-
-
-
-
 
 let cmp_set_like_lists lst1 lst2 =
   let uniq1 = List.sort_uniq compare lst1 in
@@ -55,6 +45,8 @@ let die2_3 = [|'H';'M';'S';'R';'A';'O'|]
 
 let standard_2 = [|die2_0; die2_1; die2_2; die2_3|]
 
+let generate_ex x  = fun () -> generate x 
+
 let board_tests = [
   (**Board size test *)
   "board size" >:: (fun _ -> assert_equal 4 (size board));
@@ -91,6 +83,15 @@ let board_tests = [
   "score test3" >:: (fun _ -> assert_equal 1
                         (word_score "i" board));
 
+  (**Checking for exceptions in board generation*)
+  "generating invalid size" >:: (fun _ -> assert_raises (InvalidSize(3))
+                                    (generate_ex (Standard 3)));
+  "generating invalid size" >:: (fun _ -> assert_raises (InvalidSize(6))
+                                    (generate_ex (Standard 6)));
+  "generating invalid file" >:: (fun _ -> assert_raises 
+                                    (InvalidFile "hi.txt: No such file or \
+                                                  directory")
+                                    (generate_ex (Custom_board ("hi.txt", 6))));
 ]
 
 let state_0 = init board []
@@ -102,9 +103,6 @@ let empty_state = init board []
 let step_leaderboard = add_leaderboard (leaderboard empty_state) [10] 4 
 let state_next = init board step_leaderboard
 let step2_leaderboard = add_leaderboard (leaderboard state_next) [10] 5
-
-
-
 
 let state_tests = [
   (**Checking if score is updated when word found on board.*)
@@ -132,9 +130,6 @@ let state_tests = [
 
   ("leaderboard test 2" >:: (fun _ -> assert_equal ([(4, [10])]) 
                                 (leaderboard state_next)));
-
-
-
 ]
 
 let trie0 = Trie.empty
