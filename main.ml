@@ -226,8 +226,14 @@ and end_game game_number st wrds time=
   print_string ("\nWords missed:\n");
   print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) []);
   print_string ("\nAverage time between words: ");
-  print_float (floor(0.5+.((min (90. -. (time-. Unix.time ())) 90. ) 
-                           /. (float (List.length wrds)))));
+  print_float 
+    ((floor(
+         ((
+           (min (90.) (90.-.time+.Unix.time()))
+           *. 10.)
+           /. 
+           (float (List.length wrds)))+. 0.5)
+      )/. 10.);
   print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st)) []  in
@@ -288,6 +294,7 @@ let word_blitz_art () =
 
 let main () =
   ignore (clear 0);
+  ANSITerminal.resize(140) (20);
   print_string "Welcome to \n\n";
   word_blitz_art ();
   print_string "\nForm and enter words contained on the \
