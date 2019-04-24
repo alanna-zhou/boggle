@@ -270,7 +270,9 @@ and end_game game_number st wrds time=
   print_string ("\nWords found:\n");
   print_format_lst (ANSITerminal.(print_string [green])) wrds;
   print_string ("\nWords missed:\n");
-  print_format_lst (ANSITerminal.(print_string [yellow] )) wrds;
+  print_format_lst (ANSITerminal.(print_string [yellow] )) 
+    (unfound wrds (Board.get_possible_words (State.board st)) []);
+
   print_string ("\nAverage time between words: ");
   print_float 
     ((floor(
