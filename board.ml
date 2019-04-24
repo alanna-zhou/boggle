@@ -42,7 +42,8 @@ let scrabble_points = [(1, ['A';'E';'I';'O';'U';'L';'N';'S';'T';'R']);
                        (8, ['J';'K']); 
                        (10, ['Q';'Z']) ]
 
-(** [get_letter_score] gets the scrabble points of a letter, which we are using in this game to be how we calculate word scores.  *)
+(** [get_letter_score] gets the scrabble points of a letter, which we are using
+    in this game to be how we calculate word scores.  *)
 let get_letter_score (c:char) : int = 
   let rec helper lst = 
     match lst with 
@@ -86,7 +87,8 @@ let random_char die_arr (bound:int) =
   let random_int = Random.int bound in 
   Array.get die_arr random_int
 
-(** [size] gets the size of a board as an integer. For example, 4x4 board's size is 4.  *)
+(** [size] gets the size of a board as an integer. For example, 4x4 board's 
+    size is 4.  *)
 let size board = 
   int_of_float (sqrt (float_of_int (List.length (board.nodes))))
 
@@ -190,8 +192,9 @@ let nodes_of_neighbors (node:node) (board:t) : node list =
   in rec_nodes neighbor_positions []
 
 (** [get_string_from_nodes] when given a list of nodes, will return the string 
-    formed by the nodes (but in reverse order - the reason for this is to optimize 
-    accessing nodes from the front as prepending is faster than appending) *)
+    formed by the nodes (but in reverse order - the reason for this is to 
+    optimize accessing nodes from the front as prepending is faster than 
+    appending) *)
 let get_string_from_nodes (nodes:node list) : string = 
   let char_array = List.map (fun x -> x.letter) nodes in 
   let string_array = List.map (fun x -> Char.escaped x) char_array in 
@@ -199,8 +202,9 @@ let get_string_from_nodes (nodes:node list) : string =
 
 (** [get_BFS_neighbors] returns a sequence of nodes; gets neighbors of last 
     node in the sequence, and then subtracts from these neighbors any nodes that
-    are already present in the sequence. This is used only for the BFS traversal;
-    which is finding all the possible words on a board in [populate_board] *)
+    are already present in the sequence. This is used only for the BFS 
+    traversal;which is finding all the possible words on a board in 
+    [populate_board] *)
 let get_BFS_neighbors (nodes:node list) board : node list =
   match nodes with
   | [] -> []
@@ -332,9 +336,11 @@ let is_word_on_board (word:string) (board:t) : bool =
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  if Trie.contains english_words (String.lowercase_ascii word) then is_word_on_board word board else false
+  if Trie.contains english_words (String.lowercase_ascii word) then 
+    is_word_on_board word board else false
 
-(** [string_to_chars] takes in a string and converts it to a list of              characters. *)
+(** [string_to_chars] takes in a string and converts it to a list of 
+    characters. *)
 let string_to_chars (word:string) : char list = 
   let rec helper index acc = 
     if index < 0 then acc
@@ -367,9 +373,11 @@ let rec mid_board board size left=
         begin
           if t = [] then
             let () = if (h.position + 1) mod size = 0 then begin
-                ANSITerminal.(print_string [Underlined] (Char.escaped h.letter)); print_string "|\n"
+                ANSITerminal.(print_string [Underlined] 
+                                (Char.escaped h.letter)); print_string "|\n"
               end else 
-                ANSITerminal.(print_string [Underlined] ((Char.escaped h.letter) ^ " ")) in 
+                ANSITerminal.(print_string [Underlined] 
+                                ((Char.escaped h.letter) ^ " ")) in 
             (mid_board {board with nodes=t} size (left-1))
           else
             let () = if (h.position + 1) mod size = 0 then begin
@@ -449,7 +457,10 @@ let is_valid_word2 (word:string) (board:t) : node list =
     in (List.rev (node_loop nodes_fst_letter)) 
   end
 
-(** [nodes_and_colors word board] returns a list of letter and color tuples,      with the letter being that of the node on the board, and color being either   Green, Red, or White. This is to highlight the nodes on the board that make   up the word passed in to this method. *)
+(** [nodes_and_colors word board] returns a list of letter and color tuples, 
+    with the letter being that of the node on the board, and color being either 
+    Green, Red, or White. This is to highlight the nodes on the board that make 
+    up the word passed in to this method. *)
 let nodes_and_colors (word:string) (board:t) : (char*color) list = 
   let helper = 
     let nodes_of_word = is_valid_word2 word board in 
