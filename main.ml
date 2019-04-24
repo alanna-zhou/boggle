@@ -220,14 +220,8 @@ and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
-<<<<<<< HEAD
-  print_string ("\nWords found:\n");
+  print_string ("\n\nWords found:\n");
   print_green_list wrds;
-=======
-  print_string ("\n\nWords found.\n");
-  print_list wrds;
->>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
-
   print_string ("\nWords missed:\n");
   print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) []);
   print_string ("\nAverage time between words: ");
@@ -242,7 +236,6 @@ and end_game game_number st wrds time=
 and print_yellow_list lst =
   match lst with
   |[]-> ()
-<<<<<<< HEAD
   |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h); print_yellow_list t)
     else (ANSITerminal.(print_string [yellow] (h ^ ", "))); print_yellow_list t
 
@@ -251,11 +244,7 @@ and print_green_list lst =
   |[]-> ()
   |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); print_green_list t)
     else (ANSITerminal.(print_string [green] (h ^ ", "))); print_green_list t
-=======
-  |h::t-> if t = [] then (print_string (h); print_list t)
-    else print_string (h ^ ", "); print_list t
 
->>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
 
 and unfound found total acc=
   match total with
@@ -278,7 +267,6 @@ and is_game_over time =
 
 
 let word_blitz_art () =
-<<<<<<< HEAD
   print_string "WW               WW                                   dd      \
                \          BBBBBB      lll             tt                 !!\n";
   print_string "WW               WW                                   dd      \
@@ -295,22 +283,12 @@ let word_blitz_art () =
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
                \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
-=======
-  print_string "WW               WW                                   dd      \\          BBBBBB      lll             tt                 !!\n";
-  print_string "WW               WW                                   dd      \\          BB   BB      ll           tttttt               !!\n";
-  print_string " WW             WW                                    dd      \\          BB   BB      ll     ii      tt                 !!\n";
-  print_string " WW      W      WW      ooooo      rr rrr       ddddd dd      \\          BBBBBB       ll             tt      zzzzzz     !!\n";
-  print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd      \\          BB   BB      ll    iii      tt         zz      !!\n";
-  print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd      \\          BB   BB      ll     ii      tt        zz         \n";
-  print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \\          BB   BB      ll     ii      tt       zz        !!\n";
-  print_string "    WWW     WWW         ooooo      rr           ddddd dd      \\          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n\n"
->>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
 
 
 
 let main () =
   ignore (clear 0);
-  print_string "Welcome to \n";
+  print_string "Welcome to \n\n";
   word_blitz_art ();
   print_string "\nForm and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
