@@ -155,22 +155,41 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
   else begin
     try 
       format_color (State.board st) (Board.size (State.board st)) (lguess);
-      print_string ("\nWords found: " ^ 
+      print_string ("\n\nWords found: " ^ 
                     (make_list found_wrds "") ^ "\nEnter a word: ");
       match (Command.parse(read_line ())) with
       (*|Quit -> print_string "hi"; end_game game_number st*)
-      |Score -> print_string ("\nYour score: " ^ string_of_int (State.score st));
+      |Score -> print_string ("\nYour score: " ^ 
+                              string_of_int (State.score st) ^ "\n");
         playing_game time st found_wrds game_number ""
       |Quit -> end_game game_number st found_wrds time
       |Leaderboard -> print_leaderboard (leaderboard st); 
         playing_game time st found_wrds game_number ""
-      |Hint -> failwith "unimplemented"
+      |Hint -> if State.num_hints st < 1 then (
+          print_string "You are out of hints.\n";
+          playing_game time st found_wrds game_number lguess) else 
+          let hint_state = State.hint st in 
+          print_string ("Your hint is: " ^ (snd hint_state) ^ "\n");
+          playing_game time (fst hint_state) found_wrds game_number lguess
       |Help -> print_string "\nTo play a word, enter that word.\
-                             To see your current score, enter #score.\
+                             \nTo see your current score, enter #score.\
                              \nTo quit/restart game, enter #quit.\
-                             For a hint, enter #hint.\
-                             To see the leaderboard, enter #leaderboard.\
-                             To see instructions, enter #help.";
+                             \nFor a hint, enter #hint.\
+                             \nTo see the leaderboard, enter #leaderboard.\
+                             \nTo see instructions, enter #help.
+                             \nIf you want to input custom boards, or custom \
+                             die, you can upload txt files for those. \
+                             \n\nFor custom die, see 4x4.txt as an example. \
+                             Line number x contains the 6 sided configurations\
+                             for each die on position number x on the board. \
+                             These are capital letters not separated by any \
+                             space. For a 4x4 board, you must have 16 lines \
+                             corresponding to the 16 die. \n\n\
+                             For custom boards, see board1.txt as an example \
+                             txt file. The board is drawn out with no spaces \
+                             between characters. The number of lines in the \
+                             file should correspond to the dimension of the \
+                             board. \n";
         playing_game time st found_wrds game_number ""
       |Entry (guess) -> 
         ignore(clear 0);
@@ -186,10 +205,11 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
     with 
     | Failure x -> ignore(clear 0);
       ANSITerminal.(print_string [red] (x));
-      print_string (" is not a valid input."); 
+      print_string (" is not a valid input. \n"); 
       playing_game time st found_wrds game_number ""
     |Empty -> ignore(clear 0); 
-      ANSITerminal.(print_string [red] "\nEntry is empty, choose another word.");
+      ANSITerminal.(print_string [red] 
+                      "\nEntry is empty, choose another word.\n");
       playing_game time st found_wrds game_number ""
 
 
@@ -200,8 +220,13 @@ and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
+<<<<<<< HEAD
   print_string ("\nWords found:\n");
   print_green_list wrds;
+=======
+  print_string ("\n\nWords found.\n");
+  print_list wrds;
+>>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
 
   print_string ("\nWords missed:\n");
   print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) []);
@@ -217,6 +242,7 @@ and end_game game_number st wrds time=
 and print_yellow_list lst =
   match lst with
   |[]-> ()
+<<<<<<< HEAD
   |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h); print_yellow_list t)
     else (ANSITerminal.(print_string [yellow] (h ^ ", "))); print_yellow_list t
 
@@ -225,6 +251,11 @@ and print_green_list lst =
   |[]-> ()
   |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); print_green_list t)
     else (ANSITerminal.(print_string [green] (h ^ ", "))); print_green_list t
+=======
+  |h::t-> if t = [] then (print_string (h); print_list t)
+    else print_string (h ^ ", "); print_list t
+
+>>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
 
 and unfound found total acc=
   match total with
@@ -232,6 +263,8 @@ and unfound found total acc=
   |h::t-> if List.mem h found then unfound found t acc
     else unfound found t (h::acc)
 
+(** [prompt_end] asks for user input on whether or not they'd like to 
+    continue playing.  *)
 and prompt_end game_number leaderboard () =
   print_string "\nPlay again? y/n : ";
   match read_line () with 
@@ -245,6 +278,7 @@ and is_game_over time =
 
 
 let word_blitz_art () =
+<<<<<<< HEAD
   print_string "WW               WW                                   dd      \
                \          BBBBBB      lll             tt                 !!\n";
   print_string "WW               WW                                   dd      \
@@ -261,6 +295,16 @@ let word_blitz_art () =
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
                \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
+=======
+  print_string "WW               WW                                   dd      \\          BBBBBB      lll             tt                 !!\n";
+  print_string "WW               WW                                   dd      \\          BB   BB      ll           tttttt               !!\n";
+  print_string " WW             WW                                    dd      \\          BB   BB      ll     ii      tt                 !!\n";
+  print_string " WW      W      WW      ooooo      rr rrr       ddddd dd      \\          BBBBBB       ll             tt      zzzzzz     !!\n";
+  print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd      \\          BB   BB      ll    iii      tt         zz      !!\n";
+  print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd      \\          BB   BB      ll     ii      tt        zz         \n";
+  print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \\          BB   BB      ll     ii      tt       zz        !!\n";
+  print_string "    WWW     WWW         ooooo      rr           ddddd dd      \\          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n\n"
+>>>>>>> a69de5e37d1a42a76169a6f0ba70f9fea42c8903
 
 
 
@@ -275,7 +319,11 @@ let main () =
                 board the way you want. \nYou cannot use a board element more \
                 than once on the board. Type #hint for a hint, but do know \
                 that you have a maximum of 3 hints - each hint will lead to a \
-                small score deduction. \n";
+                deduction worth 5 points. If you enter words within 5 seconds \
+                of each other, the score of the second word will be tripled! \
+                View your previous scores using #leaderboard at any time and \
+                do your personal best! View your current score using #score. \
+                Quit any time using #quit. \n";
   prompt_board_type 0 [] ()
 
 let () = main ()
