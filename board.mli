@@ -123,7 +123,7 @@ val testing_board3: unit -> t
     @return letter and color tuple list to help main know what letters to color
     Raises: No Exceptions
     Example: [nodes_and_colors "bad" (testing_board3 ())] returns [('B', Green); ('A', Green); ('T', White); ('D', Green); ('E', White); ('L', White); ('S', White); ('N', White); ('E', White)]
-    *)
+*)
 val nodes_and_colors : string -> t -> (char*color) list
 
 
