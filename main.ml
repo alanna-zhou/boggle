@@ -160,17 +160,17 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
       match (Command.parse(read_line ())) with
       (*|Quit -> print_string "hi"; end_game game_number st*)
       |Score -> print_string ("\nYour score: " ^ 
-      string_of_int (State.score st) ^ "\n");
+                              string_of_int (State.score st) ^ "\n");
         playing_game time st found_wrds game_number ""
       |Quit -> end_game game_number st found_wrds time
       |Leaderboard -> print_leaderboard (leaderboard st); 
         playing_game time st found_wrds game_number ""
       |Hint -> if State.num_hints st < 1 then (
-      print_string "You are out of hints.\n";
-      playing_game time st found_wrds game_number lguess) else 
-      let hint_state = State.hint st in 
-      print_string ("Your hint is: " ^ (snd hint_state) ^ "\n");
-      playing_game time (fst hint_state) found_wrds game_number lguess
+          print_string "You are out of hints.\n";
+          playing_game time st found_wrds game_number lguess) else 
+          let hint_state = State.hint st in 
+          print_string ("Your hint is: " ^ (snd hint_state) ^ "\n");
+          playing_game time (fst hint_state) found_wrds game_number lguess
       |Help -> print_string "\nTo play a word, enter that word.\
                              \nTo see your current score, enter #score.\
                              \nTo quit/restart game, enter #quit.\
@@ -209,7 +209,7 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
       playing_game time st found_wrds game_number ""
     |Empty -> ignore(clear 0); 
       ANSITerminal.(print_string [red] 
-      "\nEntry is empty, choose another word.\n");
+                      "\nEntry is empty, choose another word.\n");
       playing_game time st found_wrds game_number ""
 
 
@@ -283,7 +283,11 @@ let main () =
                 board the way you want. You cannot use a board element more \
                 than once on the board. Type #hint for a hint, but do know \
                 that you have a maximum of 3 hints - each hint will lead to a \
-                small score deduction. \n";
+                deduction worth 5 points. If you enter words within 5 seconds \
+                of each other, the score of the second word will be tripled! \
+                View your previous scores using #leaderboard at any time and \
+                do your personal best! View your current score using #score. \
+                Quit any time using #quit. \n";
   prompt_board_type 0 [] ()
 
 let () = main ()
