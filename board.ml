@@ -25,12 +25,15 @@ type board_type =
   | Custom_die of (string * size) 
   | Custom_board of (string * size)
 
+(* used to generate random boards *)
 let consonants = [|'B';'C';'D';'F';'G';'H';'J';'K';'L';'M';
                    'N';'P';'Q';'R';'S';'T';'V';'W';'X';'Y';'Z'|]
 let vowels = [|'A';'E';'I';'O';'U'|]
 
+(* a Trie of all the possible english words that can be entered in the game *)
 let english_words = add_words_from_file "usa.txt"
 
+(* mapping of letters to scrabble point system *)
 let scrabble_points = [(1, ['A';'E';'I';'O';'U';'L';'N';'S';'T';'R']); 
                        (2, ['D';'G']); 
                        (3, ['B';'C';'M';'P']); 
@@ -39,6 +42,7 @@ let scrabble_points = [(1, ['A';'E';'I';'O';'U';'L';'N';'S';'T';'R']);
                        (8, ['J';'K']); 
                        (10, ['Q';'Z']) ]
 
+(** [get_letter_score] gets the scrabble points of a letter, which we are using in this game to be how we calculate word scores.  *)
 let get_letter_score (c:char) : int = 
   let rec helper lst = 
     match lst with 
@@ -70,8 +74,6 @@ let create_die_arr (filename:string) (board_dim:int) : (char array) array =
     Array.of_list (List.rev (read_loop open_file filename [] []))
   end else raise (InvalidFile(filename))
 
-
-
 (** [create_node l p] creates a node, to be placed in a board, with
     the field letter set as l, position set as p, and points set to
     a randomnly generated number from 1-5. *)
@@ -84,6 +86,7 @@ let random_char die_arr (bound:int) =
   let random_int = Random.int bound in 
   Array.get die_arr random_int
 
+(** [size] gets the size of a board as an integer. For example, 4x4 board's size is 4.  *)
 let size board = 
   int_of_float (sqrt (float_of_int (List.length (board.nodes))))
 
@@ -314,6 +317,7 @@ let rec validate_node (node:node) (index:int) (board:t) (str:string)
     (process_nlist possible_neighbors false)
   end
 
+(** [is_word_on_board] takes a word and checks if it exists on the board. *)
 let is_word_on_board (word:string) (board:t) : bool =
   let upper_word = String.uppercase_ascii word in
   let first_char = upper_word.[0] in 
@@ -328,24 +332,14 @@ let is_word_on_board (word:string) (board:t) : bool =
     dictionary and could be formed following the rules on board [b], and false
     otherwise. *)
 let is_valid_word (word:string) (board:t) : bool = 
-  if Trie.contains english_words (String.lowercase_ascii word) then begin 
-    let upper_word = String.uppercase_ascii word in
-    let first_char = upper_word.[0] in 
-    let nodes_fst_letter = (get_node_letter first_char board.nodes []) in
-    let rec node_loop lst acc = 
-      match lst with
-      | [] -> acc
-      | h :: t -> node_loop t (acc || validate_node h 0 board upper_word []) in
-    (node_loop nodes_fst_letter false)
-  end else false
+  if Trie.contains english_words (String.lowercase_ascii word) then is_word_on_board word board else false
 
-
+(** [string_to_chars] takes in a string and converts it to a list of              characters. *)
 let string_to_chars (word:string) : char list = 
   let rec helper index acc = 
     if index < 0 then acc
     else helper (index-1) (word.[index]::acc) in 
   helper (String.length word - 1) []
-
 
 (** [word_score] computes the score of a word in the context of a board. *)
 let word_score (word:string) (board:t) : int =
@@ -407,50 +401,6 @@ let rec format board size =
   mid_board board size size;
   hborder (2*size+2)
 
-(** Used to help test *)
-let testing_board1 () = 
-  let node_list = [{letter='I'; position=0}; 
-                   {letter='F'; position=1}; 
-                   {letter='D'; position=2}; 
-                   {letter='D'; position=3}; 
-                   {letter='M'; position=4}; 
-                   {letter='S'; position=5}; 
-                   {letter='A'; position=6}; 
-                   {letter='Y'; position=7}; 
-                   {letter='Q'; position=8}; 
-                   {letter='P'; position=9}; 
-                   {letter='T'; position=10}; 
-                   {letter='R'; position=11}; 
-                   {letter='N'; position=12}; 
-                   {letter='A'; position=13};
-                   {letter='I'; position=14}; 
-                   {letter='C'; position=15};] in
-  {nodes=node_list; words=Trie.empty}  
-
-let testing_board2 () = 
-  let node_list = [{letter='B'; position=0}; 
-                   {letter='A'; position=1}; 
-                   {letter='D'; position=2}; 
-                   {letter='E'; position=3}] in
-  let b = {nodes=node_list; words=Trie.empty} in
-  populate_board b
-
-let node0 = {letter='B'; position=0}
-let node1 = {letter='A'; position=1}
-let node2 = {letter='T'; position=2}
-let node3 = {letter='D'; position=3}
-let node4 = {letter='E'; position=4}
-let node5 = {letter='L'; position=5}
-let node6 = {letter='S'; position=6}
-let node7 = {letter='N'; position=7}
-let node8 = {letter='E'; position=8}
-
-let testing_board3 () = 
-  let node_list = [node0;node1;node2;node3;node4;node5;node6;node7;node8] in
-  let b = {nodes=node_list; words=Trie.empty} in
-  populate_board b
-
-
 (** [validate_node2 node idx b str pos lst] does a depth first search for word
     [str] in board [b], starting from node [node]. Returns the list of nodes 
     through which word [str] is formed if word can be formed on board; 
@@ -499,6 +449,7 @@ let is_valid_word2 (word:string) (board:t) : node list =
     in (List.rev (node_loop nodes_fst_letter)) 
   end
 
+(** [nodes_and_colors word board] returns a list of letter and color tuples,      with the letter being that of the node on the board, and color being either   Green, Red, or White. This is to highlight the nodes on the board that make   up the word passed in to this method. *)
 let nodes_and_colors (word:string) (board:t) : (char*color) list = 
   let helper = 
     let nodes_of_word = is_valid_word2 word board in 
@@ -516,3 +467,47 @@ let nodes_and_colors (word:string) (board:t) : (char*color) list =
     else 
       List.fold_left (fun acc node -> (node.letter, White)::acc) [] board.nodes
   in List.rev helper 
+
+
+(** Used to help test *)
+let testing_board1 () = 
+  let node_list = [{letter='I'; position=0}; 
+                   {letter='F'; position=1}; 
+                   {letter='D'; position=2}; 
+                   {letter='D'; position=3}; 
+                   {letter='M'; position=4}; 
+                   {letter='S'; position=5}; 
+                   {letter='A'; position=6}; 
+                   {letter='Y'; position=7}; 
+                   {letter='Q'; position=8}; 
+                   {letter='P'; position=9}; 
+                   {letter='T'; position=10}; 
+                   {letter='R'; position=11}; 
+                   {letter='N'; position=12}; 
+                   {letter='A'; position=13};
+                   {letter='I'; position=14}; 
+                   {letter='C'; position=15};] in
+  {nodes=node_list; words=Trie.empty}  
+
+let testing_board2 () = 
+  let node_list = [{letter='B'; position=0}; 
+                   {letter='A'; position=1}; 
+                   {letter='D'; position=2}; 
+                   {letter='E'; position=3}] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b
+
+let node0 = {letter='B'; position=0}
+let node1 = {letter='A'; position=1}
+let node2 = {letter='T'; position=2}
+let node3 = {letter='D'; position=3}
+let node4 = {letter='E'; position=4}
+let node5 = {letter='L'; position=5}
+let node6 = {letter='S'; position=6}
+let node7 = {letter='N'; position=7}
+let node8 = {letter='E'; position=8}
+
+let testing_board3 () = 
+  let node_list = [node0;node1;node2;node3;node4;node5;node6;node7;node8] in
+  let b = {nodes=node_list; words=Trie.empty} in
+  populate_board b

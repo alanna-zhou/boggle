@@ -155,7 +155,7 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number lguess
   else begin
     try 
       format_color (State.board st) (Board.size (State.board st)) (lguess);
-      print_string ("\nWords found: " ^ 
+      print_string ("\n\nWords found: " ^ 
                     (make_list found_wrds "") ^ "\nEnter a word: ");
       match (Command.parse(read_line ())) with
       (*|Quit -> print_string "hi"; end_game game_number st*)
@@ -220,7 +220,7 @@ and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
-  print_string ("\nWords found.\n");
+  print_string ("\n\nWords found.\n");
   print_list wrds;
 
   print_string ("\nWords missed.\n");
