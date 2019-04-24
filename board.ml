@@ -1,4 +1,4 @@
-open Trie 
+open Trie
 
 type node = {
   letter : char;
@@ -61,7 +61,7 @@ let create_die_arr (filename:string) (board_dim:int) : (char array) array =
       |exception End_of_file -> begin
           if (List.length acc = ((board_dim * board_dim) - 1)) then 
             (Array.of_list (List.rev acc2)::acc)
-          else let () = print_int 0 in raise (InvalidSize board_dim)
+          else raise (InvalidSize board_dim)
         end
       | '\n' -> if List.length acc2 = 6 then begin 
           read_loop chan file (Array.of_list (List.rev acc2)::acc) []
@@ -365,29 +365,46 @@ let rec hborder size =
   |n -> print_string"-"; hborder (size-1)
 
 (*helps format. Does middle of board*)
-let rec mid_board board size=
+let rec mid_board board size left=
   match board.nodes with
   | [] -> ()
-  | h::t -> begin
-      if t = [] then
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+  | h::t -> begin 
+      if left = 1 then 
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                ANSITerminal.(print_string [Underlined] (Char.escaped h.letter)); print_string "|\n"
+              end else 
+                ANSITerminal.(print_string [Underlined] ((Char.escaped h.letter) ^ " ")) in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
       else
-        let () = if (h.position + 1) mod size = 0 then begin
-            (print_char h.letter ; print_string " " ; print_string "|\n|")
-          end else 
-            (print_char h.letter; print_string " ") in 
-        (mid_board {board with nodes=t} size)
+        begin
+          if t = [] then
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string " " ; print_string "|\n")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size (left-1))
+          else
+            let () = if (h.position + 1) mod size = 0 then begin
+                (print_char h.letter ; print_string "|\n|")
+              end else 
+                (print_char h.letter; print_string " ") in 
+            (mid_board {board with nodes=t} size left)
+        end
     end
-
 (** [format] formats the board in string form.  *)
 let rec format board size = 
   hborder (2*size+2);
   print_string "\n|";
-  mid_board board size;
+  mid_board board size size;
   hborder (2*size+2)
 
 (** Used to help test *)
@@ -476,7 +493,6 @@ let is_valid_word2 (word:string) (board:t) : node list =
       | [] -> []
       | h :: t -> begin
           let result = validate_node2 h 0 board upper_word [] [h] in 
-          let () = print_int (List.length result) in 
           if ((List.length result)) = String.length word 
           then result else node_loop t
         end 
