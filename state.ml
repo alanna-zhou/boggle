@@ -53,7 +53,7 @@ let rec hintify_help chars =
 and mystery_spaces remaining =
   match remaining with
   | [] -> ""
-  | x::xs -> "_" ^ mystery_spaces xs
+  | x::xs -> " _" ^ mystery_spaces xs
 
 let rec string_to_list str =
   match str with
@@ -64,6 +64,9 @@ let rec string_to_list str =
 let hintify str =
   hintify_help (string_to_list str)
 
+(** [hint state] is a random string based on a word the user has not yet found
+  in the game represented by [state]. The format is the first letter of the
+  word followed by underscores with spaces between each character*)
 let hint (state:t) : (t * string) =
 if state.hints_left <= 0 then failwith "No hints remaining" else
 let updated_state = 
@@ -76,6 +79,7 @@ let updated_state =
   in 
   (updated_state, hintify hinted)
 
+(** [num_hints state] is the number of hints the user has left*)
 let num_hints state =
   state.hints_left
 
@@ -101,8 +105,8 @@ let multiplier score =
   score * 3
 
 (** [update] updates a state with a newly added word by validating if the word 
-    is a valid word (on the board and in the English language - this is dependent 
-    upon Board's implementation of [is_valid_word]). *)
+    is a valid word (on the board and in the English language - this is 
+    dependent upon Board's implementation of [is_valid_word]). *)
 let update (state:t) (word:string) : t =
   let times = (Unix.time ())::state.last_times in 
   let new_words = Trie.add_word state.words word in 
