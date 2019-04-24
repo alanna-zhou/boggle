@@ -25,8 +25,8 @@ let rec prompt_board_size () =
 
 (*prints a terminal representation of the board with a border and letters
   colored in to signify the status of the previously guessed word. It highlights
-  the letters in teh word that were just guessed; Green if it was valid and Red if
-  it was invalid.*)
+  the letters in teh word that were just guessed; Green if it was valid and Red
+   if it was invalid.*)
 let format_color (board:Board.t) (size:size) (word:string): unit =
   print_string "\n ";
   let rec tborder count =
@@ -188,8 +188,8 @@ and prompt_board_type game_number leaderboard () =
                      prompt_board_type game_number leaderboard ());
 
     (*The main recursive function for the game. Chnages the state of the 
-      game/what is displayed on the terminal based on the user input. Whether it is a 
-      #command or if it is a guess*)
+      game/what is displayed on the terminal based on the user input. Whether
+       it is a #command or if it is a guess*)
 and playing_game time(st: State.t) (found_wrds: string list) game_number lguess=
   let () = Random.self_init () in 
   if is_game_over time
