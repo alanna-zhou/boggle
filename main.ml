@@ -5,12 +5,17 @@ open State
 type game = {
   state : State.t;
 }
+(*Clears everything written in the terminal*)
 let clear x = Sys.command("clear")+x
+
+(*turns a list into a string of the contents separated by a semicolon*)
 let rec make_list lst acc=
   match lst with 
   |[]-> acc
   |h::t-> make_list t (h ^ "; " ^ acc)
 
+(*Prompts for the size of the board, returns invalid if something other than
+  a string is entered*)
 let rec prompt_board_size () =
   try 
     let size = int_of_string (read_line()) in size
@@ -18,6 +23,10 @@ let rec prompt_board_size () =
   |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
     prompt_board_size ()
 
+(*prints a terminal representation of the board with a border and letters
+  colored in to signify the status of the previously guessed word. It highlights
+  the letters in teh word that were just guessed; Green if it was valid and Red if
+  it was invalid.*)
 let format_color (board:Board.t) (size:size) (word:string): unit =
   print_string "\n ";
   let rec tborder count =
@@ -77,6 +86,8 @@ let format_color (board:Board.t) (size:size) (word:string): unit =
   in (helper node_color_lst () 1 size);
   print_string "|"
 
+(** Prompts for a file name to be entered. If the text file is not in a valid 
+    board representation then it prompts again .*)
 let rec prompt_board_file () =
   try 
     let file = read_line() in file
@@ -84,6 +95,8 @@ let rec prompt_board_file () =
   |Failure x-> ANSITerminal.(print_string [red] "Invalid size, try again.");
     prompt_board_file ()
 
+(**Prompts for the board type to be entered. S for statndard r for random or c
+   for custom *)
 and prompt_board_type game_number leaderboard () =
   print_string "\nWhat kind of board would you like?";
   print_string  "\nType s for Standard, r for Random, or c for Custom. "; 
@@ -127,6 +140,8 @@ and prompt_board_type game_number leaderboard () =
                                                     the inputted size. "));
             prompt_board_type game_number leaderboard ()
         end
+      |"#quit" -> ()
+      |"#help" -> print_help(); prompt_board_type game_number leaderboard ()
       |_ -> ANSITerminal.(print_string [red] "\nInvalid entry"; 
                           prompt_board_type game_number leaderboard ());
     end
@@ -167,12 +182,15 @@ and prompt_board_type game_number leaderboard () =
                                                   size. "));
         prompt_board_type game_number leaderboard ()
     end
+  |"#quit" -> ()
+  |"#help" -> print_help(); prompt_board_type game_number leaderboard ()
   |_-> ANSITerminal.(print_string [red] "\nInvalid entry"; 
                      prompt_board_type game_number leaderboard ());
 
-
-and playing_game time (st: State.t) (found_wrds: string list) game_number 
-    lguess=
+    (*The main recursive function for the game. Chnages the state of the 
+      game/what is displayed on the terminal based on the user input. Whether it is a 
+      #command or if it is a guess*)
+and playing_game time(st: State.t) (found_wrds: string list) game_number lguess=
   let () = Random.self_init () in 
   if is_game_over time
   then 
@@ -180,8 +198,9 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number
   else begin
     try 
       format_color (State.board st) (Board.size (State.board st)) (lguess);
-      print_string ("\n\nWords found: " ^ 
-                    (make_list found_wrds "") ^ "\nEnter a word: ");
+      print_string "\n\nWords found: "; 
+      print_format_lst print_string found_wrds;
+      print_string "\nEnter a word: ";
       match (Command.parse(read_line ())) with
       (*|Quit -> print_string "hi"; end_game game_number st*)
       |Score -> print_string ("\nYour score: " ^ 
@@ -196,25 +215,7 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number
           let hint_state = State.hint st in 
           print_string ("Your hint is: " ^ (snd hint_state) ^ "\n");
           playing_game time (fst hint_state) found_wrds game_number lguess
-      |Help -> print_string "\nTo play a word, enter that word.\
-                             \nTo see your current score, enter #score.\
-                             \nTo quit/restart game, enter #quit.\
-                             \nFor a hint, enter #hint.\
-                             \nTo see the leaderboard, enter #leaderboard.\
-                             \nTo see instructions, enter #help.
-                             \nIf you want to input custom boards, or custom \
-                             die, you can upload txt files for those. \
-                             \n\nFor custom die, see 4x4.txt as an example. \
-                             Line number x contains the 6 sided configurations\
-                             for each die on position number x on the board. \
-                             These are capital letters not separated by any \
-                             space. For a 4x4 board, you must have 16 lines \
-                             corresponding to the 16 die. \n\n\
-                             For custom boards, see board1.txt as an example \
-                             txt file. The board is drawn out with no spaces \
-                             between characters. The number of lines in the \
-                             file should correspond to the dimension of the \
-                             board. \n";
+      |Help -> print_help ();
         playing_game time st found_wrds game_number ""
       |Entry (guess) -> 
         ignore(clear 0);
@@ -239,48 +240,58 @@ and playing_game time (st: State.t) (found_wrds: string list) game_number
 
 
   end 
+and print_help () =
+  ignore (clear 0);
+  print_string "\nTo play a word, enter that word.\
+                \nTo see your current score, enter #score.\
+                \nTo quit/restart game, enter #quit.\
+                \nFor a hint, enter #hint.\
+                \nTo see the leaderboard, enter #leaderboard.\
+                \nTo see instructions, enter #help.
+                \nIf you want to input custom boards, or custom \
+                die, you can upload txt files for those. \
+                \n\nFor custom die, see 4x4.txt as an example. \
+                Line number x contains the 6 sided configurations\
+                for each die on position number x on the board. \
+                These are capital letters not separated by any \
+                space. For a 4x4 board, you must have 16 lines \
+                corresponding to the 16 die. \n\n\
+                For custom boards, see board1.txt as an example \
+                txt file. The board is drawn out with no spaces \
+                between characters. The number of lines in the \
+                file should correspond to the dimension of the \
+                board. \n";
 
-(** [end_game] ends the game.  *)
+  (** [end_game] ends the game.  *)
 and end_game game_number st wrds time=
   ANSITerminal.(print_string [red] "\nGame Over"); 
   print_string ("\nYour score: ");
   ANSITerminal.(print_string [green](string_of_int (State.score st))); 
   print_string ("\nWords found:\n");
-  print_green_list wrds;
-
+  print_format_lst (ANSITerminal.(print_string [green])) wrds;
   print_string ("\nWords missed:\n");
-  print_yellow_list (unfound wrds (Board.get_possible_words (State.board st)) 
-                       []);
+  print_format_lst (ANSITerminal.(print_string [yellow] )) wrds;
   print_string ("\nAverage time between words: ");
   print_float 
     ((floor(
-         ((
-           (min (90.) (90.-.time+.Unix.time()))
+         (((min (90.) (90.-.time+.Unix.time()))
            *. 10.)
-           /. 
-           (float (List.length wrds)))+. 0.5)
-      )/. 10.);
+          /. 
+          (float (List.length wrds)))
+         +. 0.5))
+     /. 10.);
   print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st))  in
   let () = print_leaderboard new_leaderboard in 
   (prompt_end game_number (new_leaderboard) ())
 
-and print_yellow_list lst =
+and print_format_lst f lst =
   match lst with
   |[]-> ()
-  |h::t-> if t = [] then (ANSITerminal.(print_string [yellow] h);
-                          print_yellow_list t)
-    else (ANSITerminal.(print_string [yellow] (h ^ ", ")));
-    print_yellow_list t
-
-and print_green_list lst =
-  match lst with
-  |[]-> ()
-  |h::t-> if t = [] then (ANSITerminal.(print_string [green] h); 
-                          print_green_list t)
-    else (ANSITerminal.(print_string [green] (h ^ ", "))); 
-    print_green_list t
+  |h::t-> if t = [] then begin 
+      (f h); (print_format_lst f t);end
+    else (f (h ^ ", ")); print_format_lst f t
 
 and unfound found total acc=
   match total with
@@ -329,7 +340,7 @@ let main () =
   word_blitz_art ();
   print_string "\nForm and enter words contained on the \
                 board by connecting letters horizontally, vertically, or \
-                diagonally. \nAt any time, type #help for gameplay instructions.\
+                diagonally. \nAt any time, type #help for game instructions.\
                 You can choose a board of your desired size, and configure a \
                 board the way you want. \nYou cannot use a board element more \
                 than once on the board. Type #hint for a hint, but do know \
@@ -342,3 +353,5 @@ let main () =
   prompt_board_type 0 [] ()
 
 let () = main ()
+
+
