@@ -133,7 +133,7 @@ let state_tests = [
 ]
 
 let trie0 = Trie.empty
-let trie1 = Trie.add_words_from_file "words.txt"
+let trie1 = Trie.add_words_from_file "usa.txt"
 let trie2 = Trie.add_word (Trie.add_word Trie.empty "computer") "computers"
 let trie_tests = [
   "contains 'rat'" >:: (fun _ -> assert_equal true (contains trie1

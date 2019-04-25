@@ -98,8 +98,8 @@ val leaderboard: t -> (int * (int list)) list
     @param size is the board size for which to add these scores
     @param acc is an accumulating leaderboard
     @return leaderboard with elements added
-    Raises: N/A
-    Example: [add_leaderboard l [5; 10] 5 [] = [(5, [5;10])] *)
+    Raises: N/A 
+    Example: add_leaderboard l [5; 10] 5 [] gives (5, [5;10]) as part of a list *)
 val add_leaderboard: (int * (int list)) list -> int list -> 
   int -> (int * (int list)) list
 

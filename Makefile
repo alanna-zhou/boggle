@@ -19,7 +19,7 @@ play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 
 zip:
-	zip a6.zip *.ml* *.json _tags Makefile usa.txt
+	zip a7.zip *.ml* *.json _tags Makefile *.txt
 
 docs: docs-public docs-private
 

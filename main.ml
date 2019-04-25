@@ -146,10 +146,9 @@ and prompt_board_type game_number leaderboard () =
                           prompt_board_type game_number leaderboard ());
     end
   |"r" -> print_string "\nWhat size board would you like? For example, \
-                        entering 10 will create a 10x10 board. Entry must be\
-                        less than 20. ";
+                        entering 10 will create a 10x10 board. Entry must be\ less than 20. ";
     let s = prompt_board_size () in 
-    if s < 21 && s > 6
+    if s < 21 && s >= 6
     then playing_game (Unix.time() +. 90.) 
         (State.init (Board.generate (Random(s))) 
            (if game_number = 0 then [] else leaderboard)) []
