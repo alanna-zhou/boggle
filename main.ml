@@ -232,7 +232,7 @@ and playing_game time(st: State.t) (found_wrds: string list) game_number lguess=
     | Failure x -> ignore(clear 0);
       ANSITerminal.(print_string [red] (x));
       print_string (" is not a valid input. \n"); 
-      playing_game time st found_wrds game_number ""
+      playing_game time st found_wrds game_number x
     |Empty -> ignore(clear 0); 
       ANSITerminal.(print_string [red] 
                       "\nEntry is empty, choose another word.\n");
@@ -277,14 +277,14 @@ and end_game game_number st wrds time=
 
   print_string ("\nAverage time between words: ");
   if List.length wrds = 0 then print_int 0 else
-  print_float 
-    ((floor(
-         (((min (90.) (90.-.time+.Unix.time()))
-           *. 10.)
-          /. 
-          (float (List.length wrds)))
-         +. 0.5))
-     /. 10.);
+    print_float 
+      ((floor(
+           (((min (90.) (90.-.time+.Unix.time()))
+             *. 10.)
+            /. 
+            (float (List.length wrds)))
+           +. 0.5))
+       /. 10.);
   print_string (" seconds");
   let new_leaderboard = add_leaderboard (leaderboard st) ([score st]) 
       (size (board st))  in
@@ -319,7 +319,9 @@ and is_game_over time =
 
 
 let word_blitz_art () =
-  print_string "WW               WW                                   dd      \
+  print_string "************************************************************\
+                *************************************************************\
+                \nWW               WW                                   dd      \
                \          BBBBBB      lll             tt                 !!\n";
   print_string "WW               WW                                   dd      \
                \          BB   BB      ll           tttttt               !!\n";
@@ -334,7 +336,9 @@ let word_blitz_art () =
   print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
-               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n"
+               \          BBBBBB        ll   iiii      ttt    zzzzzz     !!\n";
+  print_string "************************************************************\
+                *************************************************************"
 
 
 
