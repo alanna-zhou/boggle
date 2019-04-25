@@ -276,6 +276,7 @@ and end_game game_number st wrds time=
     (unfound wrds (Board.get_possible_words (State.board st)) []);
 
   print_string ("\nAverage time between words: ");
+  if List.length wrds = 0 then print_int 0 else
   print_float 
     ((floor(
          (((min (90.) (90.-.time+.Unix.time()))
@@ -329,7 +330,7 @@ let word_blitz_art () =
   print_string "  WW    WWW    WW     oo     oo    rrr        dd     ddd      \
                \          BB   BB      ll    iii      tt         zz      !!\n";
   print_string "  WW   WW WW   WW    oo       oo   rr         dd      dd      \
-               \          BB   BB      ll     ii      tt        zz         \n";
+               \          BB   BB      ll     ii      tt        zz       !!\n";
   print_string "   WW WW   WW WW      oo     oo    rr         dd     ddd      \
                \          BB   BB      ll     ii      tt       zz        !!\n";
   print_string "    WWW     WWW         ooooo      rr           ddddd dd      \
