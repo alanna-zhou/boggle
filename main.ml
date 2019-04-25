@@ -242,7 +242,8 @@ and playing_game time(st: State.t) (found_wrds: string list) game_number lguess=
   end 
 and print_help () =
   ignore (clear 0);
-  print_string "\nTo play a word, enter that word.\
+  print_string "\n***********************************************************\
+                \nTo play a word, enter that word.\
                 \nTo see your current score, enter #score.\
                 \nTo quit/restart game, enter #quit.\
                 \nFor a hint, enter #hint.\
@@ -260,7 +261,8 @@ and print_help () =
                 txt file. The board is drawn out with no spaces \
                 between characters. The number of lines in the \
                 file should correspond to the dimension of the \
-                board. \n";
+                board. \n\
+                ************************************************************\n";
 
   (** [end_game] ends the game.  *)
 and end_game game_number st wrds time=
