@@ -3,7 +3,8 @@ type t = Head of t list | Node of (string * t list * bool) | Leaf
 
 let empty = Head ([Leaf])
 
-(** [add_word_help trie word] is a helper for [add_word] that deals with adding a character to a single node*)
+(** [add_word_help trie word] is a helper for [add_word] that deals with adding
+  a character to a single node*)
 let rec add_word_help trie word =
   let curchar = String.sub word 0 1 in 
   let tail = String.sub word 1 ((String.length word) - 1) in
@@ -13,7 +14,8 @@ let rec add_word_help trie word =
     | Leaf -> Node (curchar, update_children [Leaf] tail,
     String.length word = 1)
     | _ -> failwith "Function does not accept Head as input"
-(** [update_children children word] is a helper for [add_word] that deals with adding a character to a list of nodes, aka the children of another node*)
+(** [update_children children word] is a helper for [add_word] that deals with 
+adding a character to a list of nodes, aka the children of another node*)
 and update_children children word =
   if word = "" then children else
     let curchar = String.sub word 0 1 in 
@@ -22,8 +24,7 @@ and update_children children word =
     | (Node (c, childs, is_word))::xs -> if c = curchar then
     (add_word_help (Node (c, childs, String.length word = 1 || is_word)) word)
     ::xs else
-    (Node (c, childs, is_word))
-    ::(update_children xs word)
+    (Node (c, childs, is_word))::(update_children xs word)
     | [Leaf]
     | [] -> [(Node (curchar, update_children [Leaf] tail, 
     String.length word = 1))]
@@ -55,7 +56,8 @@ let add_words_from_file (filename:string) : t =
   read_words empty (open_in filename);;
 
 (** [contains_help trie word] is a helper function for 
-  [contains] that deals with a single node, passing its children, if any, to [check_charf]*)
+  [contains] that deals with a single node, passing its children, 
+  if any, to [check_charf]*)
 let rec contains_help trie word =
   let tail = String.sub word 1 ((String.length word) - 1) in 
   match trie with
@@ -85,7 +87,8 @@ let contains (trie:t) (word:string) : bool =
   | _ -> contains_help trie word
 
 (** [contains_prefix_help trie pref] is a helper function for 
-  [contains_prefix] that deals with a single node, passing its children, if any, to [check_pref]*)
+  [contains_prefix] that deals with a single node, passing its children, 
+  if any, to [check_pref]*)
 let rec contains_prefix_help trie pref =
   let tail = String.sub pref 1 ((String.length pref) - 1) in 
   match trie with
